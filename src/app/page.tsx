@@ -5,158 +5,137 @@ import {
   UsersIcon,
   ScaleIcon,
 } from "@heroicons/react/24/outline";
-
-import {
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-
-type Subnet = {
-  subnet: number;
-  weight: number;
-};
-
-const data: Subnet[] = [
-  { subnet: 39, weight: 19.28 },
-  { subnet: 14, weight: 15.36 },
-  { subnet: 2, weight: 14.65 },
-  // ... Add all other subnets here
-  { subnet: 41, weight: 0.0 },
-];
-const columnHelper = createColumnHelper<Subnet>();
-
-const columns = [
-  columnHelper.accessor("subnet", {
-    cell: (info) => `Subnet ${info.getValue()}`,
-    header: () => "Subnet",
-  }),
-  columnHelper.accessor("weight", {
-    cell: (info) => `${info.getValue().toFixed(2)}%`,
-    header: () => "Weight",
-  }),
-];
+import Image from "next/image";
 
 export default function HomePage() {
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
   return (
-    <main className="flex flex-col justify-between gap-2 p-2 font-mono">
-      <div className="flex flex-col justify-between rounded-md border border-black p-2">
-        <p className="text-md">Make your Tao work for you</p>
-        <p className="py-4 text-sm">
-          Delegate to earn rewards while supporting your chosen subnets.
-        </p>
-        <p className="py-2 text-sm">You decide which subnets to incentivize!</p>
-        <p className="pb-4 pt-2 text-sm">
-          Giving power back to the delegators.
-        </p>
-        <Link
-          href="/stake"
-          className="flex w-fit items-center gap-2 rounded-md bg-black p-2 text-white"
-        >
-          Stake Tao
-          <RocketLaunchIcon className="h-4 w-4" />
-        </Link>
-      </div>
-      <div className="flex flex-col justify-between gap-2 rounded-md border border-black p-2">
-        <p className="text-md">Validator Details </p>
-        <p className="text-sm">
-          Hotkey: <span className="font-mono text-gray-500"> hotkey..</span>
-        </p>
-        <p className="text-sm">
-          Coldkey: <span className="font-mono text-gray-500"> coldkey..</span>
-        </p>
-        <p className="text-sm">
-          Stake: <span className="font-mono text-gray-500"> Stake..</span>
-        </p>
-        <p className="text-sm">
-          Daily Rewards:{" "}
-          <span className="font-mono text-gray-500"> Daily Rewards..</span>
-        </p>
-        <p className="text-sm">
-          Subnet Registrations:{" "}
-          <span className="font-mono text-gray-500">
-            {" "}
-            Subnet Registrations..
-          </span>
-        </p>
-        <p className="text-sm">
-          Base Fee: <span className="font-mono text-gray-500"> Base fee..</span>{" "}
-          <span className="text-black">Voter Fee:</span>
-          <span className="font-mono text-gray-500"> voter fee...</span>
-        </p>
-        <p className="text-sm">
-          Base APY: <span className="font-mono text-gray-500"> Base apy..</span>{" "}
-          <span className="text-black">Voter APY:</span>
-          <span className="font-mono text-gray-500"> voter apy...</span>
-        </p>
-        <p className="text-sm">
-          Delagtors:{" "}
-          <span className="font-mono text-gray-500"> delgators..</span>{" "}
-          <span className="text-black">Voters:</span>
-          <span className="font-mono text-gray-500"> voters...</span>
-        </p>
-        <p className="text-sm">
-          Updated At:{" "}
-          <span className="font-mono text-gray-500"> updated at....</span>
-        </p>
-        <Link
-          href="/delegators"
-          className="flex w-fit items-center gap-2 rounded-md bg-black p-2 text-white"
-        >
-          Delagators
-          <UsersIcon className="h-4 w-4" />
-        </Link>
-      </div>
-      <div className="flex flex-col justify-between gap-2 rounded-md border border-black p-2">
-        <p className="text-md">Validator&apos;s Voted Subnet Weights</p>
-        <div className="overflow-y-auto">
-          <table className="w-1/3 divide-y divide-black text-sm">
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th key={header.id} className="px-2 py-1 text-left">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody className="divide-y divide-black">
-              {table.getRowModel().rows.map((row) => (
-                <tr key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-2 py-1">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <main>
+      <div>
+        {/* Hero card */}
+        <div className="relative p-4">
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gray-100" />
+          <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="relative shadow-xl sm:overflow-hidden sm:rounded-2xl">
+              <div className="absolute inset-0">
+                <div
+                  className="h-full w-full bg-gradient-to-br from-indigo-900 via-indigo-600 to-indigo-400"
+                  aria-hidden="true"
+                />
+                <div className="absolute inset-0 bg-black opacity-30 mix-blend-multiply" />
+              </div>
+              <div className="relative px-6 py-16 sm:py-24 lg:px-8 lg:py-32">
+                <h1 className="text-center text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+                  <span className="block text-white">Take control of your</span>
+                  <span className="block text-indigo-200">Tao</span>
+                </h1>
+                <p className="mx-auto mt-6 max-w-lg text-center text-xl text-indigo-200 sm:max-w-3xl">
+                  Delegate to earn rewards while supporting your chosen subnets.
+                  You decide which subnets to incentivize! Giving power back to
+                  the delegators.
+                </p>
+                <div className="mx-auto mt-10 max-w-sm sm:flex sm:max-w-none sm:justify-center">
+                  <div className="space-y-4 sm:mx-auto sm:inline-grid sm:grid-cols-3 sm:gap-5 sm:space-y-0">
+                    <Link
+                      href="/staking"
+                      className="flex items-center justify-center gap-2 rounded-md border border-transparent bg-indigo-500 bg-opacity-60 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-opacity-70 sm:px-8"
+                    >
+                      Stake Tao <RocketLaunchIcon className="h-4 w-4" />
+                    </Link>
+                    <Link
+                      href="/delagate"
+                      className="flex items-center justify-center gap-2 rounded-md border border-transparent bg-white px-4 py-3 text-base font-medium text-indigo-700 shadow-sm hover:bg-indigo-50 sm:px-8"
+                    >
+                      Delegate Now <UsersIcon className="h-4 w-4" />
+                    </Link>
+                    <Link
+                      href="/weights"
+                      className="flex items-center justify-center gap-2 rounded-md border border-transparent bg-indigo-500 bg-opacity-60 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-opacity-70 sm:px-8"
+                    >
+                      Manage Your Weights <ScaleIcon className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <Link
-          href="/weights"
-          className="flex w-fit items-center gap-2 rounded-md bg-black p-2 text-white"
-        >
-          Manage Your Weights
-          <ScaleIcon className="h-4 w-4" />
-        </Link>
+
+        {/* Logo cloud */}
+        <div className="bg-gray-100">
+          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+            <p className="text-center text-base font-semibold text-gray-500">
+              Trusted by Top Validators
+            </p>
+            <div className="mt-6">
+              <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+                <div className="group flex h-full flex-col items-center justify-center">
+                  <div className="flex flex-grow items-center justify-center">
+                    <Link href="https://foundrydigital.com/" target="_blank">
+                    <Image
+                      alt="Foundry"
+                      src="/foundrylogo.jpg"
+                      width={150}
+                      height={80}
+                      className="rounded-full object-contain opacity-50 grayscale filter transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0"
+                    />
+                    </Link>
+                  </div>
+                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold">
+                    Foundry
+                  </p>
+                </div>
+                <div className="group flex h-full flex-col items-center justify-center">
+                  <div className="flex flex-grow items-center justify-center">
+                    <Link href="https://opentensor.ai/" target="_blank">
+                    <Image
+                      alt="OTF"
+                      src="/otf-logo.svg"
+                      width={150}
+                      height={80}
+                      className="object-contain opacity-50 grayscale filter transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0"
+                    />
+                    </Link>
+                  </div>
+                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold">
+                    OTF
+                  </p>
+                </div>
+                <div className="group flex h-full flex-col items-center justify-center">
+                  <div className="flex flex-grow items-center justify-center">
+                    <Link href="https://www.roundtable21.com/" target="_blank">
+                    <Image
+                      alt="RoundTable21"
+                      src="/roundtable21logo.jpg"
+                      width={150}
+                      height={80}
+                      className="rounded-full object-contain opacity-50 grayscale filter transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0"
+                    />
+                    </Link>
+                  </div>
+                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold">
+                    RoundTable21
+                  </p>
+                </div>
+                <div className="group flex h-full flex-col items-center justify-center">
+                  <div className="flex flex-grow items-center justify-center">
+                    <Link href="https://www.manifold.inc/" target="_blank">
+                    <Image
+                      alt="Manifold Labs"
+                      src="/ManifoldLogoGreen.png"
+                      width={150}
+                      height={80}
+                      className="rounded-full object-contain opacity-50 grayscale filter transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0"
+                    />
+                    </Link>
+                  </div>
+                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold">
+                    Manifold Labs
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   );

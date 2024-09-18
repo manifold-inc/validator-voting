@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { WalletIcon } from "@heroicons/react/16/solid";
@@ -16,51 +16,9 @@ const navigation = [
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [taoPrice, setTaoPrice] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch("/api/tao-price")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch price");
-        }
-        return response.json();
-      })
-      .then(
-        (data: {
-          currentPrices: Array<{ price: { price: string; expo: number } }>;
-        }) => {
-          if (data.currentPrices && data.currentPrices.length > 0) {
-            const priceData = data.currentPrices[0]?.price;
-            if (
-              priceData?.price !== undefined &&
-              priceData.expo !== undefined
-            ) {
-              const priceValue =
-                Number(priceData.price) * Math.pow(10, priceData.expo);
-              setTaoPrice(priceValue);
-            } else {
-              throw new Error("Invalid price data");
-            }
-          } else {
-            throw new Error("Price data not found");
-          }
-          setIsLoading(false);
-        },
-      )
-      .catch((err: Error) => {
-        setError(err.message);
-        setIsLoading(false);
-      });
-  }, []);
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
 
   return (
-    <header className="border-b border-black bg-white">
+    <header className="border-b border-gray-300 bg-white">
       <nav
         aria-label="Global"
         className="flex items-center justify-between p-6 lg:px-8"
@@ -69,13 +27,6 @@ export default function Navbar() {
           <Link href="/" className="-m-1.5 p-1.5">
             <span className="sr-only">Validator Voting</span>
             <Image alt="" src="/BridgeTao.svg" width={32} height={32} />
-          </Link>
-          <Link
-            href="https://www.coingecko.com/en/coins/bittensor"
-            target="_blank"
-            className="text-sm font-semibold leading-6 text-gray-900 hover:underline"
-          >
-            {taoPrice ? `$${taoPrice.toFixed(2)}` : "Loading..."}
           </Link>
         </div>
         <div className="flex lg:hidden">
@@ -93,7 +44,7 @@ export default function Navbar() {
             <Link
               key={item.name}
               href={item.href}
-              className="text-sm font-semibold leading-6 text-gray-900 hover:underline"
+              className="text-sm font-semibold leading-6 text-black hover:underline"
             >
               {item.name}
             </Link>
@@ -102,7 +53,7 @@ export default function Navbar() {
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
           <button
             type="button"
-            className="flex gap-2 text-sm font-semibold leading-6 text-gray-900 hover:underline"
+            className="flex gap-2 text-sm font-semibold leading-6 text-black hover:underline"
           >
             Connect Wallet <WalletIcon className="h-6 w-6" />
           </button>
