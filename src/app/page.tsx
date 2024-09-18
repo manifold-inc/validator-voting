@@ -18,7 +18,7 @@ export default function HomePage() {
             <div className="relative shadow-xl sm:overflow-hidden sm:rounded-2xl">
               <div className="absolute inset-0">
                 <div
-                  className="h-full w-full bg-gradient-to-br from-indigo-900 via-indigo-600 to-indigo-400 "
+                  className="h-full w-full bg-gradient-to-br from-indigo-900 via-indigo-600 to-indigo-400"
                   aria-hidden="true"
                 />
                 <div className="absolute inset-0 bg-black opacity-30 mix-blend-multiply" />
@@ -62,7 +62,7 @@ export default function HomePage() {
 
         {/* Logo cloud */}
         <div className="bg-gray-200">
-          <div className="mx-auto max-w-7xl px-6 pt-16 pb-4 lg:px-8">
+          <div className="mx-auto max-w-7xl px-6 pb-4 pt-16 lg:px-8">
             <p className="text-center text-base font-semibold text-gray-500">
               Trusted by Top Validators
             </p>
@@ -80,7 +80,7 @@ export default function HomePage() {
                       />
                     </Link>
                   </div>
-                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold group-hover:scale-150">
+                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:scale-150 group-hover:font-bold">
                     Foundry
                   </p>
                 </div>
@@ -96,7 +96,7 @@ export default function HomePage() {
                       />
                     </Link>
                   </div>
-                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold group-hover:scale-150">
+                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:scale-150 group-hover:font-bold">
                     OTF
                   </p>
                 </div>
@@ -112,7 +112,7 @@ export default function HomePage() {
                       />
                     </Link>
                   </div>
-                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold group-hover:scale-150">
+                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:scale-150 group-hover:font-bold">
                     RoundTable21
                   </p>
                 </div>
@@ -128,7 +128,7 @@ export default function HomePage() {
                       />
                     </Link>
                   </div>
-                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold group-hover:scale-150">
+                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:scale-150 group-hover:font-bold">
                     Manifold Labs
                   </p>
                 </div>
