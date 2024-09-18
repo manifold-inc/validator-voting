@@ -41,7 +41,9 @@ export default function WalletModal({
     setErrorMessage(null);
     try {
       // Enable web3
-      const extensions = await web3Enable(process.env.POLKADOT_EXTENSION_ID ?? "Tao Validator Voting");
+      const extensions = await web3Enable(
+        process.env.POLKADOT_EXTENSION_ID ?? "Tao Validator Voting",
+      );
       if (extensions.length === 0) {
         throw new Error(
           "No Polkadot extension found. Please install the Polkadot.js extension and try again.",
@@ -72,7 +74,7 @@ export default function WalletModal({
     setSelectedAccount(null);
     setAccounts([]);
     setConnectionState("idle");
-    onConnectionChange(false); 
+    onConnectionChange(false);
     if (unsubscribe) {
       unsubscribe();
       setUnsubscribe(null);
@@ -82,7 +84,7 @@ export default function WalletModal({
   const handleAccountSelect = (account: InjectedAccountWithMeta) => {
     setSelectedAccount(account);
     setConnectionState("connected");
-    onConnectionChange(true); 
+    onConnectionChange(true);
   };
 
   const getStatusIcon = () => {
