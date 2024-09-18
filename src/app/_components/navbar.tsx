@@ -60,7 +60,7 @@ export default function Navbar() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <header className="bg-white">
+    <header className="border-b border-black bg-white">
       <nav
         aria-label="Global"
         className="flex items-center justify-between p-6 lg:px-8"
