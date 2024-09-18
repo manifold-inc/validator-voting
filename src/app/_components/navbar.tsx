@@ -6,6 +6,9 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { WalletIcon } from "@heroicons/react/16/solid";
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const WalletModal = dynamic(() => import("./walletModal"), { ssr: false });
 
 const navigation = [
   { name: "Validator", href: "/" },
@@ -16,6 +19,14 @@ const navigation = [
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+
+  const handleConnectionChange = (connected: boolean) => {
+    setIsConnected(connected);
+  };
+  const openWalletModal = () => setIsWalletModalOpen(true);
+  const closeWalletModal = () => setIsWalletModalOpen(false);
 
   return (
     <header className="bg-white">
@@ -53,9 +64,11 @@ export default function Navbar() {
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
           <button
             type="button"
+            onClick={openWalletModal}
             className="flex gap-2 text-sm font-semibold leading-6 text-black hover:underline"
           >
-            Connect Wallet <WalletIcon className="h-6 w-6" />
+            {isConnected ? "Wallet" : "Connect Wallet"}{" "}
+            <WalletIcon className="h-6 w-6" />
           </button>
         </div>
       </nav>
@@ -68,7 +81,7 @@ export default function Navbar() {
         <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
             <a href="#" className="-m-1.5 p-1.5">
-              <span className="sr-only">Your Company</span>
+              <span className="sr-only">Manifold Labs</span>
               <Image alt="" src="/BridgeTao.svg" width={32} height={32} />
             </a>
             <button
@@ -94,17 +107,22 @@ export default function Navbar() {
                 ))}
               </div>
               <div className="py-6">
-                <a
-                  href="#"
+                <button
+                  onClick={openWalletModal}
                   className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                 >
-                  Connect Wallet
-                </a>
+                  {isConnected ? "Wallet" : "Connect Wallet"}
+                </button>
               </div>
             </div>
           </div>
         </DialogPanel>
       </Dialog>
+      <WalletModal
+        isOpen={isWalletModalOpen}
+        onClose={closeWalletModal}
+        onConnectionChange={handleConnectionChange}
+      />
     </header>
   );
 }
