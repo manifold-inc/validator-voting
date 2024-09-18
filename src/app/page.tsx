@@ -18,7 +18,7 @@ export default function HomePage() {
             <div className="relative shadow-xl sm:overflow-hidden sm:rounded-2xl">
               <div className="absolute inset-0">
                 <div
-                  className="h-full w-full bg-gradient-to-br from-indigo-900 via-indigo-600 to-indigo-400"
+                  className="h-full w-full bg-gradient-to-br from-indigo-900 via-indigo-600 to-indigo-400 "
                   aria-hidden="true"
                 />
                 <div className="absolute inset-0 bg-black opacity-30 mix-blend-multiply" />
@@ -61,74 +61,74 @@ export default function HomePage() {
         </div>
 
         {/* Logo cloud */}
-        <div className="bg-gray-100">
-          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+        <div className="bg-gray-200">
+          <div className="mx-auto max-w-7xl px-6 pt-16 pb-4 lg:px-8">
             <p className="text-center text-base font-semibold text-gray-500">
               Trusted by Top Validators
             </p>
             <div className="mt-6">
-              <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-                <div className="group flex h-full flex-col items-center justify-center">
-                  <div className="flex flex-grow items-center justify-center">
+              <div className="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-4">
+                <div className="group flex flex-col items-center justify-center p-2">
+                  <div className="flex items-center justify-center">
                     <Link href="https://foundrydigital.com/" target="_blank">
-                    <Image
-                      alt="Foundry"
-                      src="/foundrylogo.jpg"
-                      width={150}
-                      height={80}
-                      className="rounded-full object-contain opacity-50 grayscale filter transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0"
-                    />
+                      <Image
+                        alt="Foundry"
+                        src="/foundrylogo.jpg"
+                        width={100}
+                        height={60}
+                        className="rounded-full object-contain transition-transform duration-300 group-hover:scale-110"
+                      />
                     </Link>
                   </div>
-                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold">
+                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold group-hover:scale-150">
                     Foundry
                   </p>
                 </div>
                 <div className="group flex h-full flex-col items-center justify-center">
                   <div className="flex flex-grow items-center justify-center">
                     <Link href="https://opentensor.ai/" target="_blank">
-                    <Image
-                      alt="OTF"
-                      src="/otf-logo.svg"
-                      width={150}
-                      height={80}
-                      className="object-contain opacity-50 grayscale filter transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0"
-                    />
+                      <Image
+                        alt="OTF"
+                        src="/otf-logo.svg"
+                        width={100}
+                        height={60}
+                        className="object-contain transition-transform duration-300 group-hover:scale-110"
+                      />
                     </Link>
                   </div>
-                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold">
+                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold group-hover:scale-150">
                     OTF
                   </p>
                 </div>
                 <div className="group flex h-full flex-col items-center justify-center">
                   <div className="flex flex-grow items-center justify-center">
                     <Link href="https://www.roundtable21.com/" target="_blank">
-                    <Image
-                      alt="RoundTable21"
-                      src="/roundtable21logo.jpg"
-                      width={150}
-                      height={80}
-                      className="rounded-full object-contain opacity-50 grayscale filter transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0"
-                    />
+                      <Image
+                        alt="RoundTable21"
+                        src="/roundtable21logo.jpg"
+                        width={100}
+                        height={60}
+                        className="rounded-full object-contain transition-transform duration-300 group-hover:scale-110"
+                      />
                     </Link>
                   </div>
-                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold">
+                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold group-hover:scale-150">
                     RoundTable21
                   </p>
                 </div>
                 <div className="group flex h-full flex-col items-center justify-center">
                   <div className="flex flex-grow items-center justify-center">
                     <Link href="https://www.manifold.inc/" target="_blank">
-                    <Image
-                      alt="Manifold Labs"
-                      src="/ManifoldLogoGreen.png"
-                      width={150}
-                      height={80}
-                      className="rounded-full object-contain opacity-50 grayscale filter transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0"
-                    />
+                      <Image
+                        alt="Manifold Labs"
+                        src="/ManifoldLogoPink.png"
+                        width={100}
+                        height={60}
+                        className="rounded-full object-contain transition-transform duration-300 group-hover:scale-110"
+                      />
                     </Link>
                   </div>
-                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold">
+                  <p className="mt-2 text-sm text-gray-500 transition-all duration-300 group-hover:font-bold group-hover:scale-150">
                     Manifold Labs
                   </p>
                 </div>

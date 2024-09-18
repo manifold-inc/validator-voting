@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import Navbar from "~/app/_components/navbar";
+import Footer from "~/app/_components/footer";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -18,6 +19,7 @@ export default function RootLayout({
       <body>
         <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );
