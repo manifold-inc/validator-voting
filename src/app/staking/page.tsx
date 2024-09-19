@@ -2,10 +2,13 @@
 import { RocketLaunchIcon } from "@heroicons/react/24/solid";
 import { useState, useEffect } from "react";
 import { env } from "~/env.mjs";
+import { useWalletStore } from "~/providers/wallet-store-provider";
 
 export default function Staking() {
   const [taoAmount, setTaoAmount] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
+
+  const connectedAccount = useWalletStore((state) => state.connectedAccount);
 
   useEffect(() => {
     // Check if taoAmount is not empty and is a valid number
@@ -41,7 +44,7 @@ export default function Staking() {
                 Your Address:
               </label>
               <div className="mt-2 text-gray-400 sm:col-span-2 sm:mt-0">
-                THINKING OF USING CONTEXT/ZUSTAND TO STORE THIS
+                {connectedAccount}
               </div>
             </div>
 

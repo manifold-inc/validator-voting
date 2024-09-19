@@ -15,6 +15,7 @@ import { useState, useCallback } from "react";
 import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 import Link from "next/link";
 import { type InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
+import { useWalletStore } from "~/providers/wallet-store-provider";
 
 interface WalletModalProps {
   isOpen: boolean;
@@ -35,6 +36,9 @@ export default function WalletModal({
     useState<InjectedAccountWithMeta | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [unsubscribe, setUnsubscribe] = useState<(() => void) | null>(null);
+
+  const connectAccount = useWalletStore((state) => state.connectAccount);
+  const disconnectAccount = useWalletStore((state) => state.disconnectAccount);
 
   const handleConnect = async () => {
     setConnectionState("connecting");
@@ -75,15 +79,17 @@ export default function WalletModal({
     setAccounts([]);
     setConnectionState("idle");
     onConnectionChange(false);
+    disconnectAccount();
     if (unsubscribe) {
       unsubscribe();
       setUnsubscribe(null);
     }
-  }, [unsubscribe, onConnectionChange]);
+  }, [unsubscribe, onConnectionChange, disconnectAccount]);
 
   const handleAccountSelect = (account: InjectedAccountWithMeta) => {
     setSelectedAccount(account);
     setConnectionState("connected");
+    connectAccount(account.address);
     onConnectionChange(true);
   };
 
