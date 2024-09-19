@@ -35,7 +35,7 @@ export default function Staking() {
           {/* Form content */}
           <div className="relative px-6 py-2 sm:py-4 lg:px-6 lg:py-12">
             <form className="mx-auto max-w-3xl">
-              <div className="space-y-6 rounded-lg border p-6 shadow-xl sm:space-y-16">
+              <div className="space-y-6  p-6 sm:space-y-16">
                 <div>
                   <h2 className="font-semibold leading-7 text-white">
                     Delegate to {env.NEXT_PUBLIC_VALIDATOR_NAME}
