@@ -87,7 +87,7 @@ export default function WeightsPage() {
 
           <div className="relative px-6 py-2 sm:py-4 lg:px-6 lg:py-12">
             <form className="mx-auto max-w-3xl">
-              <div className="space-y-6 p-6 sm:space-y-16">
+              <div className="space-y-6 p-6">
                 <div>
                   <h2 className="font-semibold leading-7 text-white">
                     Allocate Subnet Weights with your Stake
@@ -219,7 +219,7 @@ export default function WeightsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
                   <button
                     type="button"
                     onClick={addSubnetWeight}
@@ -229,7 +229,7 @@ export default function WeightsPage() {
                       Number(weight) <= 0 ||
                       Number(weight) > 100
                     }
-                    className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full sm:w-auto rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Add Weight to Subnet
                   </button>
@@ -240,7 +240,7 @@ export default function WeightsPage() {
 
                 {subnetWeights.length > 0 && (
                   <>
-                    <p className="sticky top-0 text-lg font-medium leading-6 text-white">
+                    <p className="sticky top-0 text-lg font-medium leading-6 text-white text-center sm:text-left">
                       Added Subnet Weights
                     </p>
                     <ul className="max-h-32 divide-y divide-gray-300 overflow-y-auto">
