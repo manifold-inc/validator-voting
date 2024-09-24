@@ -29,7 +29,7 @@ export const defaultInitState: WalletState = {
 
 // Helper function to initialize the Polkadot API
 export const initPolkadotApi = async () => {
-  const provider = new WsProvider("wss://rpc.polkadot.io");
+  const provider = new WsProvider("wss://entrypoint-finney.opentensor.ai:443");
   const api = await ApiPromise.create({ provider });
   return api;
 };
