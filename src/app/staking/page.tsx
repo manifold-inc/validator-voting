@@ -44,7 +44,13 @@ export default function Staking() {
 
   const handleDelegate = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (taoAmount !== "" && !isNaN(parseFloat(taoAmount)) && connectedAccount) {
+    if (
+      taoAmount !== "" &&
+      !isNaN(parseFloat(taoAmount)) &&
+      connectedAccount &&
+      availableBalance &&
+      taoAmount <= availableBalance
+    ) {
       try {
         await handleAddStake(taoAmount);
         console.log("Delegation successful");
@@ -54,8 +60,30 @@ export default function Staking() {
         console.error("Delegation failed:", error);
         toast.error("Delegation failed");
       }
+    } else {
+      toast.error("Please enter a valid amount");
     }
-    else {
+  };
+
+  const handleUnDelegate = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (
+      taoAmount !== "" &&
+      !isNaN(parseFloat(taoAmount)) &&
+      connectedAccount &&
+      stakingBalance &&
+      taoAmount <= stakingBalance
+    ) {
+      try {
+        await handleAddStake(taoAmount);
+        console.log("Delegation successful");
+        toast.success("Delegation successful");
+        setTaoAmount("");
+      } catch (error) {
+        console.error("Delegation failed:", error);
+        toast.error("Delegation failed");
+      }
+    } else {
       toast.error("Please enter a valid amount");
     }
   };
@@ -193,18 +221,43 @@ export default function Staking() {
                 <div className="flex justify-center gap-4">
                   <button
                     className={`flex w-40 items-center justify-center gap-2 rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8 ${
-                      (taoAmount !== "" && !isNaN(parseFloat(taoAmount)) && connectedAccount) ? "" : "cursor-not-allowed opacity-60"
+                      taoAmount !== "" &&
+                      !isNaN(parseFloat(taoAmount)) &&
+                      connectedAccount
+                        ? ""
+                        : "cursor-not-allowed opacity-60"
                     }`}
-                    disabled={!(taoAmount !== "" && !isNaN(parseFloat(taoAmount)) && connectedAccount)}
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleDelegate(e)}
+                    disabled={
+                      !(
+                        taoAmount !== "" &&
+                        !isNaN(parseFloat(taoAmount)) &&
+                        connectedAccount
+                      )
+                    }
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                      handleDelegate(e)
+                    }
                   >
                     Delegate
                   </button>
                   <button
                     className={`flex w-40 items-center justify-center gap-2 rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8 ${
-                      (taoAmount !== "" && !isNaN(parseFloat(taoAmount)) && connectedAccount) ? "" : "cursor-not-allowed opacity-60"
+                      taoAmount !== "" &&
+                      !isNaN(parseFloat(taoAmount)) &&
+                      connectedAccount
+                        ? ""
+                        : "cursor-not-allowed opacity-60"
                     }`}
-                    disabled={!(taoAmount !== "" && !isNaN(parseFloat(taoAmount)) && connectedAccount)}
+                    disabled={
+                      !(
+                        taoAmount !== "" &&
+                        !isNaN(parseFloat(taoAmount)) &&
+                        connectedAccount
+                      )
+                    }
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                      handleUnDelegate(e)
+                    }
                   >
                     Undelegate
                   </button>

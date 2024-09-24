@@ -17,6 +17,7 @@ export type WalletActions = {
   disconnectAccount: () => void;
   fetchBalance: () => Promise<void>; // Add action to fetch balance
   handleAddStake: (amount: string) => Promise<void>;
+  handleRemoveStake: (amount: string) => Promise<void>;
 };
 
 // Combine state and actions into WalletStore
@@ -131,9 +132,66 @@ export const createWalletStore = (initState: WalletState = defaultInitState) =>
       const injector = await web3FromAddress(connectedAccount);
 
       const hotkeyAddress = process.env.NEXT_PUBLIC_HOTKEY_ADDRESS;
+      const amountU32 = Math.floor(parseFloat(amount) * 1e9);
 
-      const customExtrinsic =
-        api.tx.subtensorModule!.addStake!(hotkeyAddress, amount)
+      const customExtrinsic = api.tx.subtensorModule!.addStake!(
+        hotkeyAddress,
+        amountU32,
+      );
+
+      console.log("Custom extrinsic:", customExtrinsic);
+
+      try {
+        console.log("signAndSend");
+        await customExtrinsic.signAndSend(
+          connectedAccount,
+          {
+            signer: injector.signer,
+          },
+          ({ events = [], status }) => {
+            console.log("Extrinsic status:", status.type);
+
+            if (status.isInBlock) {
+              console.log(
+                "Included at block hash:",
+                status.asInBlock.toHuman(),
+              );
+              console.log("Extrinsic events: ");
+              events.forEach(({ event: { data, method, section }, phase }) => {
+                console.log(
+                  "\t",
+                  phase.toString(),
+                  `: ${section}.${method}`,
+                  data.toString(),
+                );
+              });
+            } else {
+              console.log("Current status:", status.type);
+            }
+          },
+        );
+      } catch (error) {
+        console.error("Failed to add stake:", error);
+      }
+    },
+
+    // Action to remove stake
+    handleRemoveStake: async (amount: string) => {
+      const { connectedAccount, stakingBalance } = get();
+      if (!connectedAccount || !stakingBalance) {
+        console.error("No account connected or staking balance not available");
+        return;
+      }
+      const api = await initPolkadotApi();
+      const injector = await web3FromAddress(connectedAccount);
+
+      const hotkeyAddress = process.env.NEXT_PUBLIC_HOTKEY_ADDRESS;
+      const amountU32 = Math.floor(parseFloat(amount) * 1e9);
+
+      const customExtrinsic = api.tx.subtensorModule!.removeStakeStake!(
+        hotkeyAddress,
+        amountU32,
+      );
 
       console.log("Custom extrinsic:", customExtrinsic);
 
