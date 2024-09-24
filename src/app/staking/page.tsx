@@ -20,6 +20,9 @@ export default function Staking() {
     setIsFormValid(taoAmount !== "" && !isNaN(parseFloat(taoAmount)));
   }, [taoAmount]);
 
+  console.log("stakingBalance", stakingBalance);
+  console.log("availableBalance", availableBalance);
+
   return (
     <div className="relative p-4">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
