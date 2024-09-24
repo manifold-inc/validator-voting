@@ -12,6 +12,8 @@ export default function Staking() {
   const [isFormValid, setIsFormValid] = useState(false);
 
   const connectedAccount = useWalletStore((state) => state.connectedAccount);
+  const stakingBalance = useWalletStore((state) => state.stakingBalance);
+  const availableBalance = useWalletStore((state) => state.availableBalance);
 
   useEffect(() => {
     // Check if taoAmount is not empty and is a valid number
@@ -85,7 +87,9 @@ export default function Staking() {
                         Staked:
                       </label>
                       <div className="mt-2 flex items-center justify-between text-gray-200 sm:col-span-2 sm:mt-0">
-                        <span>0.000 Tao (0.00$)</span>
+                        <span>
+                          {stakingBalance ?? "No staked balance"} Tao (0.00$)
+                        </span>
                         <button className="ml-auto rounded bg-gray-200 px-2 py-1 text-gray-700 hover:bg-gray-300">
                           MAX
                         </button>
@@ -100,7 +104,10 @@ export default function Staking() {
                         Available:
                       </label>
                       <div className="mt-2 flex items-center justify-between text-gray-200 sm:col-span-2 sm:mt-0">
-                        <span>0.000 Tao (0.00$)</span>
+                        <span>
+                          {availableBalance ?? "No available balance"} Tao
+                          (0.00$)
+                        </span>
                         <button className="ml-auto rounded bg-gray-200 px-2 py-1 text-gray-700 hover:bg-gray-300">
                           MAX
                         </button>

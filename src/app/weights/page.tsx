@@ -219,7 +219,7 @@ export default function WeightsPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
+                <div className="flex flex-col items-center justify-between space-y-4 sm:flex-row sm:space-y-0">
                   <button
                     type="button"
                     onClick={addSubnetWeight}
@@ -229,7 +229,7 @@ export default function WeightsPage() {
                       Number(weight) <= 0 ||
                       Number(weight) > 100
                     }
-                    className="w-full sm:w-auto rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                   >
                     Add Weight to Subnet
                   </button>
@@ -240,7 +240,7 @@ export default function WeightsPage() {
 
                 {subnetWeights.length > 0 && (
                   <>
-                    <p className="sticky top-0 text-lg font-medium leading-6 text-white text-center sm:text-left">
+                    <p className="sticky top-0 text-center text-lg font-medium leading-6 text-white sm:text-left">
                       Added Subnet Weights
                     </p>
                     <ul className="max-h-32 divide-y divide-gray-300 overflow-y-auto">
