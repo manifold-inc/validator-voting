@@ -84,20 +84,34 @@ export const createWalletStore = (initState: WalletState = defaultInitState) =>
         const { free, reserved, miscFrozen, feeFrozen } = balance;
         console.log("Free balance:", free.toString());
         console.log("Reserved balance:", reserved.toString());
-        console.log("Misc frozen balance:", miscFrozen ? miscFrozen.toString() : "none");
-        console.log("Fee frozen balance:", feeFrozen ? feeFrozen.toString() : "none");
+        console.log(
+          "Misc frozen balance:",
+          miscFrozen ? miscFrozen.toString() : "none",
+        );
+        console.log(
+          "Fee frozen balance:",
+          feeFrozen ? feeFrozen.toString() : "none",
+        );
 
         // Ensure miscFrozen and reserved are defined before using them
-        const miscFrozenBN = miscFrozen ? new BN(miscFrozen.toString()) : new BN(0);
-        const feeFrozenBN = feeFrozen ? new BN(feeFrozen.toString()) : new BN(0);
-        
+        const miscFrozenBN = miscFrozen
+          ? new BN(miscFrozen.toString())
+          : new BN(0);
+        const feeFrozenBN = feeFrozen
+          ? new BN(feeFrozen.toString())
+          : new BN(0);
+
         // Calculate the spendable balance
         const spendable = free.sub(BN.max(miscFrozenBN.sub(reserved), EDBN));
         console.log("Spendable balance:", spendable.toString()); // Log the spendable balance
 
         // Update the state with the calculated spendable balance
         set({ availableBalance: (spendable.toNumber() / 1e9).toString() });
-        set({ stakingBalance: (miscFrozenBN.add(feeFrozenBN).toNumber() / 1e9).toString() });
+        set({
+          stakingBalance: (
+            miscFrozenBN.add(feeFrozenBN).toNumber() / 1e9
+          ).toString(),
+        });
       } catch (error) {
         console.error("Failed to fetch balance:", error);
       }

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { env } from "~/env.mjs";
 import { useWalletStore } from "~/providers/wallet-store-provider";
+import { PriceServiceConnection } from "@pythnetwork/price-service-client";
 
 const truncateAddress = (address: string) => {
   return `${address.slice(0, 5)}...${address.slice(-5)}`;
@@ -10,10 +11,35 @@ const truncateAddress = (address: string) => {
 export default function Staking() {
   const [taoAmount, setTaoAmount] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
+  const [price, setPrice] = useState(0);
 
   const connectedAccount = useWalletStore((state) => state.connectedAccount);
   const stakingBalance = useWalletStore((state) => state.stakingBalance);
   const availableBalance = useWalletStore((state) => state.availableBalance);
+
+  useEffect(() => {
+    const fetchPrice = async () => {
+      try {
+        const connection = new PriceServiceConnection(
+          "https://hermes.pyth.network",
+        );
+
+        const priceID = [
+          "0x410f41de235f2db824e562ea7ab2d3d3d4ff048316c61d629c0b93f58584e1af",
+        ];
+        const currentPrices = await connection.getLatestPriceFeeds(priceID);
+
+        setPrice(
+          currentPrices?.[0]?.getPriceUnchecked().getPriceAsNumberUnchecked() ??
+            0,
+        );
+      } catch (err) {
+        console.error("Error fetching tao price:", err);
+      }
+    };
+
+    void fetchPrice();
+  }, []);
 
   useEffect(() => {
     // Check if taoAmount is not empty and is a valid number
@@ -91,7 +117,12 @@ export default function Staking() {
                       </label>
                       <div className="mt-2 flex items-center justify-between text-gray-200 sm:col-span-2 sm:mt-0">
                         <span>
-                          {stakingBalance ?? "No staked balance"} Tao (0.00$)
+                          {Number(stakingBalance).toFixed(4) ??
+                            "No staked balance"}{" "}
+                          Tao ||{" "}
+                          {price
+                            ? "$" + (Number(stakingBalance) * price).toFixed(2)
+                            : "Loading..."}
                         </span>
                         <button className="ml-auto rounded bg-gray-200 px-2 py-1 text-gray-700 hover:bg-gray-300">
                           MAX
@@ -108,8 +139,13 @@ export default function Staking() {
                       </label>
                       <div className="mt-2 flex items-center justify-between text-gray-200 sm:col-span-2 sm:mt-0">
                         <span>
-                          {availableBalance ?? "No available balance"} Tao
-                          (0.00$)
+                          {Number(availableBalance).toFixed(4) ??
+                            "No available balance"}{" "}
+                          Tao ||{" "}
+                          {price
+                            ? "$" +
+                              (Number(availableBalance) * price).toFixed(2)
+                            : "Loading..."}
                         </span>
                         <button className="ml-auto rounded bg-gray-200 px-2 py-1 text-gray-700 hover:bg-gray-300">
                           MAX
