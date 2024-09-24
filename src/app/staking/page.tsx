@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { env } from "~/env.mjs";
 import { useWalletStore } from "~/providers/wallet-store-provider";
 import { PriceServiceConnection } from "@pythnetwork/price-service-client";
+import { toast } from "sonner";
 
 const truncateAddress = (address: string) => {
   return `${address.slice(0, 5)}...${address.slice(-5)}`;
@@ -10,12 +11,12 @@ const truncateAddress = (address: string) => {
 
 export default function Staking() {
   const [taoAmount, setTaoAmount] = useState("");
-  const [isFormValid, setIsFormValid] = useState(false);
   const [price, setPrice] = useState(0);
 
   const connectedAccount = useWalletStore((state) => state.connectedAccount);
   const stakingBalance = useWalletStore((state) => state.stakingBalance);
   const availableBalance = useWalletStore((state) => state.availableBalance);
+  const handleAddStake = useWalletStore((state) => state.handleAddStake);
 
   useEffect(() => {
     const fetchPrice = async () => {
@@ -41,13 +42,23 @@ export default function Staking() {
     void fetchPrice();
   }, []);
 
-  useEffect(() => {
-    // Check if taoAmount is not empty and is a valid number
-    setIsFormValid(taoAmount !== "" && !isNaN(parseFloat(taoAmount)));
-  }, [taoAmount]);
-
-  console.log("stakingBalance", stakingBalance);
-  console.log("availableBalance", availableBalance);
+  const handleDelegate = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (taoAmount !== "" && !isNaN(parseFloat(taoAmount)) && connectedAccount) {
+      try {
+        await handleAddStake(taoAmount);
+        console.log("Delegation successful");
+        toast.success("Delegation successful");
+        setTaoAmount("");
+      } catch (error) {
+        console.error("Delegation failed:", error);
+        toast.error("Delegation failed");
+      }
+    }
+    else {
+      toast.error("Please enter a valid amount");
+    }
+  };
 
   return (
     <div className="relative p-4">
@@ -181,20 +192,19 @@ export default function Staking() {
                 </div>
                 <div className="flex justify-center gap-4">
                   <button
-                    type="submit"
                     className={`flex w-40 items-center justify-center gap-2 rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8 ${
-                      isFormValid ? "" : "cursor-not-allowed opacity-60"
+                      (taoAmount !== "" && !isNaN(parseFloat(taoAmount)) && connectedAccount) ? "" : "cursor-not-allowed opacity-60"
                     }`}
-                    disabled={!isFormValid}
+                    disabled={!(taoAmount !== "" && !isNaN(parseFloat(taoAmount)) && connectedAccount)}
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleDelegate(e)}
                   >
                     Delegate
                   </button>
                   <button
-                    type="submit"
                     className={`flex w-40 items-center justify-center gap-2 rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8 ${
-                      isFormValid ? "" : "cursor-not-allowed opacity-60"
+                      (taoAmount !== "" && !isNaN(parseFloat(taoAmount)) && connectedAccount) ? "" : "cursor-not-allowed opacity-60"
                     }`}
-                    disabled={!isFormValid}
+                    disabled={!(taoAmount !== "" && !isNaN(parseFloat(taoAmount)) && connectedAccount)}
                   >
                     Undelegate
                   </button>

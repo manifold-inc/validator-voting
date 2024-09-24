@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { type AccountInfo } from "@polkadot/types/interfaces";
 import BN from "bn.js";
+import { web3FromAddress } from "@polkadot/extension-dapp";
 
 // Define the wallet state with account and balance
 export type WalletState = {
@@ -15,6 +16,7 @@ export type WalletActions = {
   connectAccount: (account: string) => void;
   disconnectAccount: () => void;
   fetchBalance: () => Promise<void>; // Add action to fetch balance
+  handleAddStake: (amount: string) => Promise<void>;
 };
 
 // Combine state and actions into WalletStore
@@ -114,6 +116,58 @@ export const createWalletStore = (initState: WalletState = defaultInitState) =>
         });
       } catch (error) {
         console.error("Failed to fetch balance:", error);
+      }
+    },
+
+    // Action to add stake
+    handleAddStake: async (amount: string) => {
+      const { connectedAccount, availableBalance } = get();
+      if (!connectedAccount || !availableBalance) {
+        console.error("No account connected or balance not available");
+        return;
+      }
+
+      const api = await initPolkadotApi();
+      const injector = await web3FromAddress(connectedAccount);
+
+      const hotkeyAddress = process.env.NEXT_PUBLIC_HOTKEY_ADDRESS;
+
+      const customExtrinsic =
+        api.tx.subtensorModule!.addStake!(hotkeyAddress, amount)
+
+      console.log("Custom extrinsic:", customExtrinsic);
+
+      try {
+        console.log("signAndSend");
+        await customExtrinsic.signAndSend(
+          connectedAccount,
+          {
+            signer: injector.signer,
+          },
+          ({ events = [], status }) => {
+            console.log("Extrinsic status:", status.type);
+
+            if (status.isInBlock) {
+              console.log(
+                "Included at block hash:",
+                status.asInBlock.toHuman(),
+              );
+              console.log("Extrinsic events: ");
+              events.forEach(({ event: { data, method, section }, phase }) => {
+                console.log(
+                  "\t",
+                  phase.toString(),
+                  `: ${section}.${method}`,
+                  data.toString(),
+                );
+              });
+            } else {
+              console.log("Current status:", status.type);
+            }
+          },
+        );
+      } catch (error) {
+        console.error("Failed to add stake:", error);
       }
     },
   }));
