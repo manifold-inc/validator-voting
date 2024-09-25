@@ -44,7 +44,9 @@ export const delegateRouter = createTRPCRouter({
           result = await ctx.db
             .update(userDelegation)
             .set({ weights: weightsRecord, updated_at: new Date() })
-            .where(eq(userDelegation.connected_account, input.connected_account))
+            .where(
+              eq(userDelegation.connected_account, input.connected_account),
+            )
             .execute();
           console.log("Update operation result:", result);
           return { success: true, ud_nanoid: existingDelegation[0]!.ud_nanoid };
