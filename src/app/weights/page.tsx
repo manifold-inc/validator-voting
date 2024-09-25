@@ -8,6 +8,8 @@ import {
   ComboboxOption,
 } from "@headlessui/react";
 import { toast } from "sonner";
+import { api } from "~/trpc/react";
+import { useWalletStore } from "~/providers/wallet-store-provider";
 
 const subnets = Array.from({ length: 48 }, (_, i) => `Subnet ${i + 1}`);
 
@@ -22,6 +24,8 @@ export default function WeightsPage() {
   const [weight, setWeight] = useState("");
   const [subnetWeights, setSubnetWeights] = useState<SubnetWeight[]>([]);
 
+  const connectedAccount = useWalletStore((state) => state.connectedAccount);
+
   const filteredSubnets =
     query === ""
       ? subnets
@@ -31,14 +35,14 @@ export default function WeightsPage() {
 
   const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (/^\d*$/.test(value) && Number(value) <= 100) {
+    if (/^\d*(\.\d{0,2})?$/.test(value) && Number(value) <= 100) {
       setWeight(value);
     }
   };
 
   const addSubnetWeight = () => {
     if (selectedSubnet && weight && Number(weight) > 0) {
-      const newWeight = Number(weight);
+      const newWeight = Number(parseFloat(weight).toFixed(2));
       const existingIndex = subnetWeights.findIndex(
         (sw) => sw.subnet === selectedSubnet,
       );
@@ -56,7 +60,7 @@ export default function WeightsPage() {
         ]);
       }
 
-      setSelectedSubnet("");
+      setSelectedSubnet(null);
       setWeight("");
     }
   };
@@ -72,6 +76,15 @@ export default function WeightsPage() {
       toast.error("Total weight exceeds 100%");
     }
   }, [totalWeight]);
+
+  const applyWeightsMutation = api.delegate.addDelegateWeights.useMutation({
+    onSuccess: () => {
+      toast.success("Weights applied successfully");
+    },
+    onError: (error) => {
+      toast.error(`Error applying weights: ${error.message}`);
+    },
+  });
 
   return (
     <div className="relative p-4">
@@ -266,8 +279,21 @@ export default function WeightsPage() {
                 <div>
                   <button
                     type="button"
-                    disabled={totalWeight !== 100}
+                    disabled={totalWeight !== 100 || !connectedAccount}
                     className="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    onClick={() => {
+                      if (connectedAccount) {
+                        applyWeightsMutation.mutate({
+                          connected_account: connectedAccount,
+                          weights: subnetWeights.map(({ subnet, weight }) => ({
+                            subnet,
+                            weight,
+                          })),
+                        });
+                      } else {
+                        toast.error("Please connect your wallet first");
+                      }
+                    }}
                   >
                     Apply Weights
                   </button>

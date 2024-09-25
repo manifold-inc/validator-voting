@@ -56,6 +56,7 @@ export default function WalletModal({
 
       // Get all accounts
       const allAccounts = await web3Accounts();
+      console.log("allAccounts: ", allAccounts);
       if (allAccounts.length > 0) {
         setAccounts(allAccounts);
         setConnectionState("selecting");

@@ -163,9 +163,6 @@ export default function Staking() {
                             ? "$" + (Number(stakingBalance) * price).toFixed(2)
                             : "Loading..."}
                         </span>
-                        <button className="ml-auto rounded bg-gray-200 px-2 py-1 text-gray-700 hover:bg-gray-300">
-                          MAX
-                        </button>
                       </div>
                     </div>
 
@@ -186,9 +183,6 @@ export default function Staking() {
                               (Number(availableBalance) * price).toFixed(2)
                             : "Loading..."}
                         </span>
-                        <button className="ml-auto rounded bg-gray-200 px-2 py-1 text-gray-700 hover:bg-gray-300">
-                          MAX
-                        </button>
                       </div>
                     </div>
 

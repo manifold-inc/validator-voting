@@ -7,11 +7,11 @@ import { WalletIcon } from "@heroicons/react/16/solid";
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { useWalletStore } from "~/providers/wallet-store-provider";
 
 const WalletModal = dynamic(() => import("./walletModal"), { ssr: false });
 
 const navigation = [
-  { name: "Validator", href: "/" },
   { name: "Delegators", href: "/delegators" },
   { name: "My Stake", href: "/staking" },
   { name: "My Weights", href: "/weights" },
@@ -27,6 +27,9 @@ export default function Navbar() {
   };
   const openWalletModal = () => setIsWalletModalOpen(true);
   const closeWalletModal = () => setIsWalletModalOpen(false);
+
+  const { connectedAccount } = useWalletStore((state) => state);
+  console.log(connectedAccount);
 
   return (
     <header className="bg-white">
@@ -67,7 +70,11 @@ export default function Navbar() {
             onClick={openWalletModal}
             className="flex gap-2 text-sm font-semibold leading-6 text-black hover:underline"
           >
-            {isConnected ? "Wallet" : "Connect Wallet"}{" "}
+            {isConnected
+              ? connectedAccount?.substring(0, 5) +
+                "..." +
+                connectedAccount?.substring(connectedAccount?.length - 5)
+              : "Connect Wallet"}
             <WalletIcon className="h-6 w-6" />
           </button>
         </div>
@@ -111,7 +118,11 @@ export default function Navbar() {
                   onClick={openWalletModal}
                   className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                 >
-                  {isConnected ? "Wallet" : "Connect Wallet"}
+                  {isConnected
+                    ? connectedAccount?.substring(0, 6) +
+                      "..." +
+                      connectedAccount?.substring(connectedAccount?.length - 4)
+                    : "Connect Wallet"}
                 </button>
               </div>
             </div>

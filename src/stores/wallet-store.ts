@@ -32,7 +32,7 @@ export const defaultInitState: WalletState = {
 
 // Helper function to initialize the Polkadot API
 export const initPolkadotApi = async () => {
-  const provider = new WsProvider("wss://entrypoint-finney.opentensor.ai:443");
+  const provider = new WsProvider("wss://test.finney.opentensor.ai:443/");
   const api = await ApiPromise.create({ provider });
   return api;
 };
@@ -132,11 +132,14 @@ export const createWalletStore = (initState: WalletState = defaultInitState) =>
       const injector = await web3FromAddress(connectedAccount);
 
       const hotkeyAddress = process.env.NEXT_PUBLIC_HOTKEY_ADDRESS;
-      const amountU32 = Math.floor(parseFloat(amount) * 1e9);
+      const amountU64 = BigInt(Math.floor(parseFloat(amount) * 1e9));
+
+      console.log("hotkeyAddress: ", hotkeyAddress);
+      console.log("amountU64: ", amountU64);
 
       const customExtrinsic = api.tx.subtensorModule!.addStake!(
         hotkeyAddress,
-        amountU32,
+        amountU64,
       );
 
       console.log("Custom extrinsic:", customExtrinsic);
@@ -186,11 +189,11 @@ export const createWalletStore = (initState: WalletState = defaultInitState) =>
       const injector = await web3FromAddress(connectedAccount);
 
       const hotkeyAddress = process.env.NEXT_PUBLIC_HOTKEY_ADDRESS;
-      const amountU32 = Math.floor(parseFloat(amount) * 1e9);
+      const amountU64 = BigInt(Math.floor(parseFloat(amount) * 1e9));
 
-      const customExtrinsic = api.tx.subtensorModule!.removeStakeStake!(
+      const customExtrinsic = api.tx.subtensorModule!.removeStake!(
         hotkeyAddress,
-        amountU32,
+        amountU64,
       );
 
       console.log("Custom extrinsic:", customExtrinsic);

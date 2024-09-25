@@ -6,6 +6,7 @@ import Navbar from "~/app/_components/navbar";
 import Footer from "~/app/_components/footer";
 import { WalletStoreProvider } from "~/providers/wallet-store-provider";
 import { Toaster } from "sonner";
+import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -19,12 +20,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
-        <WalletStoreProvider>
-          <Toaster richColors />
-          <Navbar />
-          {children}
-          <Footer />
-        </WalletStoreProvider>
+        <TRPCReactProvider>
+          <WalletStoreProvider>
+            <Toaster richColors />
+            <Navbar />
+            {children}
+            <Footer />
+          </WalletStoreProvider>
+        </TRPCReactProvider>
       </body>
     </html>
   );
