@@ -5,7 +5,7 @@ import { useWalletStore } from "~/providers/wallet-store-provider";
 import { PriceServiceConnection } from "@pythnetwork/price-service-client";
 import { toast } from "sonner";
 
-const truncateAddress = (address: string) => {
+export const truncateAddress = (address: string) => {
   return `${address.slice(0, 5)}...${address.slice(-5)}`;
 };
 
