@@ -27,7 +27,7 @@ export default function Delegators() {
       const formattedData = delegateData.delegateWeightsAndStakes.map(
         (item) => ({
           ...item,
-          timestamp: new Date(item.timestamp),
+          timestamp: new Date(item.timestamp!),
           weights: item.weights
             ? Object.fromEntries(
                 Object.entries(item.weights).map(([key, value]) => [
@@ -99,7 +99,7 @@ export default function Delegators() {
             />
 
             {isLoading ? (
-              <p>Loading...</p>
+              <p className="text-white">Loading...</p>
             ) : (
               <table className="min-w-full p-4 text-white">
                 <thead>
