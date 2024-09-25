@@ -12,8 +12,8 @@ import { useWalletStore } from "~/providers/wallet-store-provider";
 const WalletModal = dynamic(() => import("./walletModal"), { ssr: false });
 
 const navigation = [
-  { name: "Delegators", href: "/delegators" },
   { name: "My Stake", href: "/staking" },
+  { name: "Delegators", href: "/delegators" },
   { name: "My Weights", href: "/weights" },
 ];
 

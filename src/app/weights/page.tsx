@@ -126,7 +126,7 @@ export default function WeightsPage() {
                         >
                           <div className="relative w-full">
                             <ComboboxInput
-                              className="w-full rounded-md border border-gray-700 bg-white py-2 pl-3 pr-10 text-black focus:border-blue-500 focus:ring-blue-500"
+                              className="w-full rounded-md border border-gray-700 bg-white py-2 pl-3 pr-10 text-black focus:border-blue-500 focus:ring-blue-500 placeholder:font-mono"
                               onChange={(e) => setQuery(e.target.value)}
                               placeholder="Select subnet"
                             />

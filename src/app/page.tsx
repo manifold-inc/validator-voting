@@ -42,7 +42,7 @@ export default function HomePage() {
                       Stake Tao <RocketLaunchIcon className="h-4 w-4" />
                     </Link>
                     <Link
-                      href="/delagate"
+                      href="/delegators"
                       className="flex items-center justify-center gap-2 rounded-md border border-transparent bg-white px-4 py-3 text-base font-medium text-indigo-700 shadow-sm hover:bg-indigo-50 sm:px-8"
                     >
                       Delegate Now <UsersIcon className="h-4 w-4" />
