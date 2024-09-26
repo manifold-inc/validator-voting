@@ -4,11 +4,11 @@ import { DonutChart } from "@tremor/react";
 import { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
 import { format } from "date-fns";
-import { truncateAddress } from "../staking/page";
 import { PriceServiceConnection } from "@pythnetwork/price-service-client";
+import { truncateAddress } from "~/utils/utils";
 
 type Delegations = {
-  connected_account: string;
+  connected_account: string | null;
   timestamp: Date;
   weights: Record<string, number>;
   stake: number | null;
@@ -72,7 +72,7 @@ export default function Delegators() {
   };
 
   const filteredData = data.filter((item) =>
-    item.connected_account.toLowerCase().includes(searchAddress.toLowerCase()),
+    item.connected_account!.toLowerCase().includes(searchAddress.toLowerCase()),
   );
 
   return (
@@ -122,15 +122,13 @@ export default function Delegators() {
                         className="cursor-pointer hover:bg-indigo-800"
                       >
                         <td className="border-b px-4 py-2">
-                          {item.stake ?? "N/A"}
+                          {item.stake}
                         </td>
                         <td className="border-b px-4 py-2">
-                          {item.stake
-                            ? `$${(item.stake * price).toFixed(2)}`
-                            : "N/A"}
+                            ${(item.stake! * price).toFixed(2)}
                         </td>
                         <td className="border-b px-4 py-2">
-                          {truncateAddress(item.connected_account)}
+                          {truncateAddress(item.connected_account!)}
                         </td>
                         <td className="border-b px-4 py-2">
                           {format(item.timestamp, "yyyy-MM-dd HH:mm:ss")}

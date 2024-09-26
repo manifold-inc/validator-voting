@@ -4,10 +4,8 @@ import { env } from "~/env.mjs";
 import { useWalletStore } from "~/providers/wallet-store-provider";
 import { PriceServiceConnection } from "@pythnetwork/price-service-client";
 import { toast } from "sonner";
+import { truncateAddress } from "~/utils/utils";
 
-export const truncateAddress = (address: string) => {
-  return `${address.slice(0, 5)}...${address.slice(-5)}`;
-};
 
 export default function Staking() {
   const [taoAmount, setTaoAmount] = useState("");

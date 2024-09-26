@@ -11,7 +11,6 @@ export default function HomePage() {
   return (
     <main>
       <div>
-        {/* Hero card */}
         <div className="relative p-4">
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gray-100" />
           <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
