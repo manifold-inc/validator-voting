@@ -5,6 +5,7 @@ import { useWalletStore } from "~/providers/wallet-store-provider";
 import { PriceServiceConnection } from "@pythnetwork/price-service-client";
 import { toast } from "sonner";
 import { truncateAddress } from "~/utils/utils";
+import { api } from "~/trpc/react";
 
 export default function Staking() {
   const [taoAmount, setTaoAmount] = useState("");
@@ -15,7 +16,6 @@ export default function Staking() {
   const availableBalance = useWalletStore((state) => state.availableBalance);
   const handleAddStake = useWalletStore((state) => state.handleAddStake);
   const handleRemoveStake = useWalletStore((state) => state.handleRemoveStake);
-  const fetchBalance = useWalletStore((state) => state.fetchBalance);
 
   useEffect(() => {
     const fetchPrice = async () => {
@@ -41,7 +41,15 @@ export default function Staking() {
     void fetchPrice();
   }, []);
 
-  console.log(fetchBalance);
+  const applyStakeMutation = api.delegate.addDelegateStake.useMutation({
+    onSuccess: () => {
+      toast.success("Delegation successful!");
+      setTaoAmount("");
+    },
+    onError: (error) => {
+      toast.error(`Error applying stake to DB: ${error.message}`);
+    },
+  });
 
   const handleDelegate = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -64,9 +72,10 @@ export default function Staking() {
       try {
         const success = await handleAddStake(taoAmount);
         if (success) {
-          console.log("Delegation successful");
-          toast.success("Delegation successful");
-          setTaoAmount("");
+          applyStakeMutation.mutate({
+            connected_account: connectedAccount,
+            stake: parseInt(taoAmount),
+          });
         } else {
           console.log("Delegation failure");
           toast.error("Delegation failure");
