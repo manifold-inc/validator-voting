@@ -6,7 +6,6 @@ import { PriceServiceConnection } from "@pythnetwork/price-service-client";
 import { toast } from "sonner";
 import { truncateAddress } from "~/utils/utils";
 
-
 export default function Staking() {
   const [taoAmount, setTaoAmount] = useState("");
   const [price, setPrice] = useState(0);
@@ -15,6 +14,8 @@ export default function Staking() {
   const stakingBalance = useWalletStore((state) => state.stakingBalance);
   const availableBalance = useWalletStore((state) => state.availableBalance);
   const handleAddStake = useWalletStore((state) => state.handleAddStake);
+  const handleRemoveStake = useWalletStore((state) => state.handleRemoveStake);
+  const fetchBalance = useWalletStore((state) => state.fetchBalance);
 
   useEffect(() => {
     const fetchPrice = async () => {
@@ -40,17 +41,19 @@ export default function Staking() {
     void fetchPrice();
   }, []);
 
+  console.log(fetchBalance);
+
   const handleDelegate = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     console.log("Delegating", taoAmount);
     console.log("Available balance:", availableBalance);
-    
+
     const enteredAmount = parseFloat(taoAmount);
     const availableAmount = parseFloat(availableBalance ?? "0");
-  
+
     // Allow for a small difference due to floating point precision
     const epsilon = 0.000001; // Adjust this value as needed
-  
+
     if (
       taoAmount !== "" &&
       !isNaN(enteredAmount) &&
@@ -59,19 +62,27 @@ export default function Staking() {
       enteredAmount <= availableAmount + epsilon
     ) {
       try {
-        await handleAddStake(taoAmount);
-        console.log("Delegation successful");
-        toast.success("Delegation successful");
-        setTaoAmount("");
+        const success = await handleAddStake(taoAmount);
+        if (success) {
+          console.log("Delegation successful");
+          toast.success("Delegation successful");
+          setTaoAmount("");
+        } else {
+          console.log("Delegation failure");
+          toast.error("Delegation failure");
+        }
       } catch (error) {
-        console.error("Delegation failed:", error);
-        toast.error("Delegation failed");
+        console.error("Delegation error: ", error);
+        toast.error("Delegation error");
       }
     } else {
       console.log("Validation failed:");
       console.log("Entered amount:", enteredAmount);
       console.log("Available amount:", availableAmount);
-      console.log("Comparison result:", enteredAmount <= availableAmount + epsilon);
+      console.log(
+        "Comparison result:",
+        enteredAmount <= availableAmount + epsilon,
+      );
       toast.error("Please enter a valid amount");
     }
   };
@@ -86,13 +97,18 @@ export default function Staking() {
       taoAmount <= stakingBalance
     ) {
       try {
-        await handleAddStake(taoAmount);
-        console.log("Delegation successful");
-        toast.success("Delegation successful");
-        setTaoAmount("");
+        const success = await handleRemoveStake(taoAmount);
+        if (success) {
+          console.log("Undelegation successful");
+          toast.success("Undelegation successful");
+          setTaoAmount("");
+        } else {
+          console.log("Undelegation failure");
+          toast.error("Undelegation failure");
+        }
       } catch (error) {
-        console.error("Delegation failed:", error);
-        toast.error("Delegation failed");
+        console.error("Delegation error:", error);
+        toast.error("Delegation error");
       }
     } else {
       toast.error("Please enter a valid amount");
@@ -167,11 +183,14 @@ export default function Staking() {
                       </label>
                       <div className="mt-2 flex items-center justify-between text-gray-200 sm:col-span-2 sm:mt-0">
                         <span>
-                          {Number(stakingBalance).toFixed(4) ??
+                          {(Number(stakingBalance) / 1e9).toFixed(4) ??
                             "No staked balance"}{" "}
                           Tao ||{" "}
                           {price
-                            ? "$" + (Number(stakingBalance) * price).toFixed(2)
+                            ? "$" +
+                              ((Number(stakingBalance) / 1e9) * price).toFixed(
+                                2,
+                              )
                             : "Loading..."}
                         </span>
                       </div>
@@ -186,12 +205,15 @@ export default function Staking() {
                       </label>
                       <div className="mt-2 flex items-center justify-between text-gray-200 sm:col-span-2 sm:mt-0">
                         <span>
-                          {Number(availableBalance).toFixed(4) ??
+                          {(Number(availableBalance) / 1e9).toFixed(4) ??
                             "No available balance"}{" "}
                           Tao ||{" "}
                           {price
                             ? "$" +
-                              (Number(availableBalance) * price).toFixed(2)
+                              (
+                                (Number(availableBalance) / 1e9) *
+                                price
+                              ).toFixed(2)
                             : "Loading..."}
                         </span>
                       </div>

@@ -121,11 +121,9 @@ export default function Delegators() {
                         }
                         className="cursor-pointer hover:bg-indigo-800"
                       >
+                        <td className="border-b px-4 py-2">{item.stake}</td>
                         <td className="border-b px-4 py-2">
-                          {item.stake}
-                        </td>
-                        <td className="border-b px-4 py-2">
-                            ${(item.stake! * price).toFixed(2)}
+                          ${(item.stake! * price).toFixed(2)}
                         </td>
                         <td className="border-b px-4 py-2">
                           {truncateAddress(item.connected_account!)}

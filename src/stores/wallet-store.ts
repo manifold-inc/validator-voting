@@ -1,7 +1,5 @@
 import { create } from "zustand";
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import { type AccountInfo } from "@polkadot/types/interfaces";
-import BN from "bn.js";
 import { env } from "~/env.mjs";
 import { web3FromAddress } from "@polkadot/extension-dapp";
 
@@ -17,8 +15,8 @@ export type WalletActions = {
   connectAccount: (account: string) => void;
   disconnectAccount: () => void;
   fetchBalance: () => Promise<void>; // Add action to fetch balance
-  handleAddStake: (amount: string) => Promise<void>;
-  handleRemoveStake: (amount: string) => Promise<void>;
+  handleAddStake: (amount: string) => Promise<boolean>;
+  handleRemoveStake: (amount: string) => Promise<boolean>;
 };
 
 // Combine state and actions into WalletStore
@@ -57,6 +55,7 @@ export const createWalletStore = (initState: WalletState = defaultInitState) =>
       }),
 
     // Action to fetch the balance
+
     fetchBalance: async () => {
       console.log("fetchBalance function called"); // Log function call
       const { connectedAccount } = get();
@@ -70,70 +69,51 @@ export const createWalletStore = (initState: WalletState = defaultInitState) =>
         const api = await initPolkadotApi();
         console.log("Polkadot API initialized"); // Log API initialization
 
-        if (!api?.query?.system?.account) {
-          console.error("Polkadot API is not properly initialized");
-          return;
+        // Check if connectedAccount is valid
+        if (!connectedAccount) {
+          throw new Error("No connected account found");
         }
 
-        // Fetch the existential deposit (ED) for Bittensor
-        const ED = api.consts.balances?.existentialDeposit;
-        const EDBN = new BN(ED?.toString() ?? "0");
-        console.log("Existential Deposit (ED):", ED?.toHuman());
+        // Query the total coldkey stake
+        const totalColdkeyStake =
+          await api.query.subtensorModule!.totalColdkeyStake!(connectedAccount);
+        console.log("Total Coldkey Stake:", totalColdkeyStake.toString());
 
-        // Cast the result to the correct type
-        const { data: balance } = (await api.query.system.account(
-          connectedAccount,
-        )) as AccountInfo;
-        console.log("Fetched balance data:", balance); // Log the fetched balance data
-        const { free, reserved, miscFrozen, feeFrozen } = balance;
-        console.log("Free balance:", free.toString());
-        console.log("Reserved balance:", reserved.toString());
-        console.log(
-          "Misc frozen balance:",
-          miscFrozen ? miscFrozen.toString() : "none",
-        );
-        console.log(
-          "Fee frozen balance:",
-          feeFrozen ? feeFrozen.toString() : "none",
-        );
+        // Query the account balance
+        const accountInfo = await api.query.system!.account!(connectedAccount);
+        console.log("Account Info:", accountInfo);
 
-        // Ensure miscFrozen and reserved are defined before using them
-        const miscFrozenBN = miscFrozen
-          ? new BN(miscFrozen.toString())
-          : new BN(0);
-        const feeFrozenBN = feeFrozen
-          ? new BN(feeFrozen.toString())
-          : new BN(0);
+        // Check if accountInfo and free balance exist
+        if (accountInfo ?? accountInfo.data ?? accountInfo.data.free) {
+          const freeBalance = accountInfo.data.free;
+          console.log("Free Balance:", freeBalance.toString());
 
-        // Calculate the spendable balance
-        const spendable = free.sub(BN.max(miscFrozenBN.sub(reserved), EDBN));
-        console.log("Spendable balance:", spendable.toString()); // Log the spendable balance
-
-        // Update the state with the calculated spendable balance
-        set({ availableBalance: (spendable.toNumber() / 1e9).toString() });
-        set({
-          stakingBalance: (
-            miscFrozenBN.add(feeFrozenBN).toNumber() / 1e9
-          ).toString(),
-        });
+          // Set the state with both the staking balance and available balance
+          set({
+            stakingBalance: totalColdkeyStake.toString(),
+            availableBalance: freeBalance.toString(),
+          });
+        } else {
+          throw new Error("Account data is not available or malformed");
+        }
       } catch (error) {
         console.error("Failed to fetch balance:", error);
       }
     },
 
     // Action to add stake
-    handleAddStake: async (amount: string) => {
+    handleAddStake: async (amount: string): Promise<boolean> => {
       const { connectedAccount, availableBalance } = get();
       if (!connectedAccount || !availableBalance) {
         console.error("No account connected or balance not available");
-        return;
+        return false;
       }
 
       const api = await initPolkadotApi();
       const injector = await web3FromAddress(connectedAccount);
 
       const hotkeyAddress = env.NEXT_PUBLIC_VALIDATOR_ADDRESS;
-      const amountU64 = (parseFloat(amount) * 1e9);
+      const amountU64 = parseFloat(amount) * 1e9;
 
       console.log("hotkeyAddress: ", hotkeyAddress);
       console.log("amountU64: ", amountU64);
@@ -174,23 +154,29 @@ export const createWalletStore = (initState: WalletState = defaultInitState) =>
             }
           },
         );
+
+        return true;
       } catch (error) {
         console.error("Failed to add stake:", error);
+        return false;
       }
     },
 
     // Action to remove stake
-    handleRemoveStake: async (amount: string) => {
+    handleRemoveStake: async (amount: string): Promise<boolean> => {
       const { connectedAccount, stakingBalance } = get();
       if (!connectedAccount || !stakingBalance) {
         console.error("No account connected or staking balance not available");
-        return;
+        return false;
       }
       const api = await initPolkadotApi();
       const injector = await web3FromAddress(connectedAccount);
 
-      const hotkeyAddress = process.env.NEXT_PUBLIC_HOTKEY_ADDRESS;
-      const amountU64 = BigInt(Math.floor(parseFloat(amount) * 1e9));
+      const hotkeyAddress = env.NEXT_PUBLIC_VALIDATOR_ADDRESS;
+      const amountU64 = parseFloat(amount) * 1e9;
+
+      console.log("hotkeyAddress: ", hotkeyAddress);
+      console.log("amountU64: ", amountU64);
 
       const customExtrinsic = api.tx.subtensorModule!.removeStake!(
         hotkeyAddress,
@@ -228,8 +214,11 @@ export const createWalletStore = (initState: WalletState = defaultInitState) =>
             }
           },
         );
+
+        return true;
       } catch (error) {
-        console.error("Failed to add stake:", error);
+        console.error("Failed to remove stake:", error);
+        return false;
       }
     },
   }));
