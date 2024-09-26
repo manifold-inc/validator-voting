@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { type AccountInfo } from "@polkadot/types/interfaces";
 import BN from "bn.js";
+import { env } from "~/env.mjs";
 import { web3FromAddress } from "@polkadot/extension-dapp";
 
 // Define the wallet state with account and balance
@@ -131,8 +132,8 @@ export const createWalletStore = (initState: WalletState = defaultInitState) =>
       const api = await initPolkadotApi();
       const injector = await web3FromAddress(connectedAccount);
 
-      const hotkeyAddress = process.env.NEXT_PUBLIC_HOTKEY_ADDRESS;
-      const amountU64 = BigInt(Math.floor(parseFloat(amount) * 1e9));
+      const hotkeyAddress = env.NEXT_PUBLIC_VALIDATOR_ADDRESS;
+      const amountU64 = (parseFloat(amount) * 1e9);
 
       console.log("hotkeyAddress: ", hotkeyAddress);
       console.log("amountU64: ", amountU64);

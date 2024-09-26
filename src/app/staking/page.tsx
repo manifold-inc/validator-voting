@@ -44,12 +44,21 @@ export default function Staking() {
 
   const handleDelegate = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    console.log("Delegating", taoAmount);
+    console.log("Available balance:", availableBalance);
+    
+    const enteredAmount = parseFloat(taoAmount);
+    const availableAmount = parseFloat(availableBalance ?? "0");
+  
+    // Allow for a small difference due to floating point precision
+    const epsilon = 0.000001; // Adjust this value as needed
+  
     if (
       taoAmount !== "" &&
-      !isNaN(parseFloat(taoAmount)) &&
+      !isNaN(enteredAmount) &&
       connectedAccount &&
       availableBalance &&
-      taoAmount <= availableBalance
+      enteredAmount <= availableAmount + epsilon
     ) {
       try {
         await handleAddStake(taoAmount);
@@ -61,6 +70,10 @@ export default function Staking() {
         toast.error("Delegation failed");
       }
     } else {
+      console.log("Validation failed:");
+      console.log("Entered amount:", enteredAmount);
+      console.log("Available amount:", availableAmount);
+      console.log("Comparison result:", enteredAmount <= availableAmount + epsilon);
       toast.error("Please enter a valid amount");
     }
   };
