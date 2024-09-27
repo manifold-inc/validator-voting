@@ -33,9 +33,8 @@ export default function WalletModal({
   const [selectedAccount, setSelectedAccount] =
     useState<InjectedAccountWithMeta | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [unsubscribe, setUnsubscribe] = useState<(() => void) | null>(null);
 
-  const connectAccount = useWalletStore((state) => state.connectAccount);
+  const setConnectedAccount = useWalletStore((state) => state.setConnectedAccount);
   const disconnectAccount = useWalletStore((state) => state.disconnectAccount);
 
   const handleConnect = async () => {
@@ -54,7 +53,6 @@ export default function WalletModal({
 
       // Get all accounts
       const allAccounts = await web3Accounts();
-      console.log("allAccounts: ", allAccounts);
       if (allAccounts.length > 0) {
         setAccounts(allAccounts);
         setConnectionState("selecting");
@@ -79,16 +77,12 @@ export default function WalletModal({
     setConnectionState("idle");
     onConnectionChange(false);
     disconnectAccount();
-    if (unsubscribe) {
-      unsubscribe();
-      setUnsubscribe(null);
-    }
-  }, [unsubscribe, onConnectionChange, disconnectAccount]);
+  }, [onConnectionChange, disconnectAccount]);
 
   const handleAccountSelect = (account: InjectedAccountWithMeta) => {
     setSelectedAccount(account);
     setConnectionState("connected");
-    connectAccount(account.address);
+    setConnectedAccount(account.address);
     onConnectionChange(true);
   };
 

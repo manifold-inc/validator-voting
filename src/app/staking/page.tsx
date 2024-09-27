@@ -6,18 +6,18 @@ import { PriceServiceConnection } from "@pythnetwork/price-service-client";
 import { toast } from "sonner";
 import { truncateAddress } from "~/utils/utils";
 import { api } from "~/trpc/react";
+import { addStake, fetchBalance, removeStake } from "~/utils/polkadotAPI";
 
 export default function Staking() {
   const [taoAmount, setTaoAmount] = useState("");
   const [price, setPrice] = useState(0);
+  const [stakingBalance, setStakingBalance] = useState("0");
+  const [availableBalance, setAvailableBalance] = useState("0");
 
   const connectedAccount = useWalletStore((state) => state.connectedAccount);
-  const stakingBalance = useWalletStore((state) => state.stakingBalance);
-  const availableBalance = useWalletStore((state) => state.availableBalance);
-  const handleAddStake = useWalletStore((state) => state.handleAddStake);
-  const handleRemoveStake = useWalletStore((state) => state.handleRemoveStake);
 
   useEffect(() => {
+    if (!connectedAccount) return;
     const fetchPrice = async () => {
       try {
         const connection = new PriceServiceConnection(
@@ -39,7 +39,18 @@ export default function Staking() {
     };
 
     void fetchPrice();
-  }, []);
+  }, [connectedAccount]);
+
+  useEffect(() => {
+    if (!connectedAccount) return;
+    const updateBalances = async () => {
+      const balances = await fetchBalance(connectedAccount);
+      setStakingBalance(balances!.stakingBalance);
+      setAvailableBalance(balances!.availableBalance);
+    };
+
+    void updateBalances();
+  }, [connectedAccount]);
 
   const applyStakeMutation = api.delegate.addDelegateStake.useMutation({
     onSuccess: () => {
@@ -70,14 +81,16 @@ export default function Staking() {
       enteredAmount <= availableAmount + epsilon
     ) {
       try {
-        const success = await handleAddStake(taoAmount);
+        const success = await addStake(connectedAccount,taoAmount);
         if (success) {
           applyStakeMutation.mutate({
             connected_account: connectedAccount,
-            stake: parseInt(taoAmount),
+            stake: taoAmount,
           });
+          const newBalances = await fetchBalance(connectedAccount);
+          setStakingBalance(newBalances!.stakingBalance);
+          setAvailableBalance(newBalances!.availableBalance);
         } else {
-          console.log("Delegation failure");
           toast.error("Delegation failure");
         }
       } catch (error) {
@@ -106,18 +119,23 @@ export default function Staking() {
       taoAmount <= stakingBalance
     ) {
       try {
-        const success = await handleRemoveStake(taoAmount);
+        const success = await removeStake(connectedAccount,taoAmount);
         if (success) {
-          console.log("Undelegation successful");
+          applyStakeMutation.mutate({
+            connected_account: connectedAccount,
+            stake: taoAmount,
+          });
           toast.success("Undelegation successful");
           setTaoAmount("");
+          const newBalances = await fetchBalance(connectedAccount);
+          setStakingBalance(newBalances!.stakingBalance);
+          setAvailableBalance(newBalances!.availableBalance);
         } else {
-          console.log("Undelegation failure");
           toast.error("Undelegation failure");
         }
       } catch (error) {
-        console.error("Delegation error:", error);
-        toast.error("Delegation error");
+        console.error("Undelegation error:", error);
+        toast.error("Undelegation error");
       }
     } else {
       toast.error("Please enter a valid amount");

@@ -22,6 +22,8 @@ export default function Delegators() {
   const { data: delegateData, isLoading } =
     api.delegate.getAllDelegateWeightsAndStakes.useQuery();
 
+  console.log("delegateData", delegateData);
+
   useEffect(() => {
     if (delegateData) {
       const formattedData = delegateData.delegateWeightsAndStakes.map(
@@ -32,10 +34,11 @@ export default function Delegators() {
             ? Object.fromEntries(
                 Object.entries(item.weights).map(([key, value]) => [
                   key,
-                  Number(value),
+                  value,
                 ]),
               )
             : {},
+          stake: item.stake ? parseFloat(item.stake) : null,
         }),
       );
       setData(formattedData);

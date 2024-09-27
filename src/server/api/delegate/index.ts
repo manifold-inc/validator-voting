@@ -78,7 +78,7 @@ export const delegateRouter = createTRPCRouter({
     .input(
       z.object({
         connected_account: z.string(),
-        stake: z.number(),
+        stake: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
