@@ -9,10 +9,10 @@ import { api } from "~/trpc/react";
 import { addStake, fetchBalance, removeStake } from "~/utils/polkadotAPI";
 
 export default function Staking() {
-  const [taoAmount, setTaoAmount] = useState("");
+  const [taoAmount, setTaoAmount] = useState<string>("");
   const [price, setPrice] = useState(0);
-  const [stakingBalance, setStakingBalance] = useState("0");
-  const [availableBalance, setAvailableBalance] = useState("0");
+  const [stakingBalance, setStakingBalance] = useState<bigint | null>(null);
+  const [availableBalance, setAvailableBalance] = useState<bigint | null>(null);
 
   const connectedAccount = useWalletStore((state) => state.connectedAccount);
 
@@ -45,16 +45,26 @@ export default function Staking() {
     if (!connectedAccount) return;
     const updateBalances = async () => {
       const balances = await fetchBalance(connectedAccount);
-      setStakingBalance(balances!.stakingBalance);
-      setAvailableBalance(balances!.availableBalance);
+      setAvailableBalance(BigInt(balances!.availableBalance));
     };
 
     void updateBalances();
   }, [connectedAccount]);
 
+  const { data: stakeData, refetch: refetchStake } =
+    api.delegate.getDelegateStake.useQuery(
+      { connected_account: connectedAccount ?? "" },
+      { enabled: !!connectedAccount },
+    );
+
+  useEffect(() => {
+    if (stakeData) {
+      setStakingBalance(stakeData.stake);
+    }
+  }, [stakeData]);
+
   const applyStakeMutation = api.delegate.addDelegateStake.useMutation({
     onSuccess: () => {
-      toast.success("Delegation successful!");
       setTaoAmount("");
     },
     onError: (error) => {
@@ -62,82 +72,67 @@ export default function Staking() {
     },
   });
 
-  const handleDelegate = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleAddStake = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    console.log("Delegating", taoAmount);
+    console.log("Adding stake amount: ", taoAmount);
     console.log("Available balance:", availableBalance);
 
-    const enteredAmount = parseFloat(taoAmount);
-    const availableAmount = parseFloat(availableBalance ?? "0");
+    const taoAmountBigInt = BigInt(Math.floor(parseFloat(taoAmount) * 1e9));
 
-    // Allow for a small difference due to floating point precision
-    const epsilon = 0.000001; // Adjust this value as needed
-
-    if (
-      taoAmount !== "" &&
-      !isNaN(enteredAmount) &&
-      connectedAccount &&
-      availableBalance &&
-      enteredAmount <= availableAmount + epsilon
-    ) {
+    if (taoAmountBigInt <= availableBalance!) {
       try {
-        const success = await addStake(connectedAccount,taoAmount);
+        const success = await addStake(connectedAccount!, taoAmountBigInt);
         if (success) {
           applyStakeMutation.mutate({
-            connected_account: connectedAccount,
-            stake: taoAmount,
+            connected_account: connectedAccount!,
+            stake: taoAmountBigInt,
           });
-          const newBalances = await fetchBalance(connectedAccount);
-          setStakingBalance(newBalances!.stakingBalance);
-          setAvailableBalance(newBalances!.availableBalance);
-        } else {
-          toast.error("Delegation failure");
+          const newBalances = await fetchBalance(connectedAccount!);
+          setAvailableBalance(BigInt(newBalances!.availableBalance));
+          void refetchStake();
         }
       } catch (error) {
-        console.error("Delegation error: ", error);
-        toast.error("Delegation error");
+        console.error("Adding Stake error: ", error);
+        toast.error("Adding Stake error");
       }
     } else {
       console.log("Validation failed:");
-      console.log("Entered amount:", enteredAmount);
-      console.log("Available amount:", availableAmount);
-      console.log(
-        "Comparison result:",
-        enteredAmount <= availableAmount + epsilon,
-      );
+      console.log("Entered amount:", taoAmountBigInt.toString());
+      console.log("Available amount:", availableBalance?.toString());
       toast.error("Please enter a valid amount");
     }
   };
 
-  const handleUnDelegate = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleRemoveStake = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (
-      taoAmount !== "" &&
-      !isNaN(parseFloat(taoAmount)) &&
-      connectedAccount &&
-      stakingBalance &&
-      taoAmount <= stakingBalance
-    ) {
+    console.log("Removing stake amount: ", taoAmount);
+    console.log("Staked balance:", stakingBalance);
+
+    const taoAmountBigInt = BigInt(Math.floor(parseFloat(taoAmount) * 1e9));
+
+    if (taoAmountBigInt <= stakingBalance!) {
       try {
-        const success = await removeStake(connectedAccount,taoAmount);
+        const success = await removeStake(connectedAccount!, taoAmountBigInt);
         if (success) {
           applyStakeMutation.mutate({
-            connected_account: connectedAccount,
-            stake: taoAmount,
+            connected_account: connectedAccount!,
+            stake: taoAmountBigInt,
           });
-          toast.success("Undelegation successful");
-          setTaoAmount("");
-          const newBalances = await fetchBalance(connectedAccount);
-          setStakingBalance(newBalances!.stakingBalance);
-          setAvailableBalance(newBalances!.availableBalance);
-        } else {
-          toast.error("Undelegation failure");
+          const newBalances = await fetchBalance(connectedAccount!);
+          setAvailableBalance(BigInt(newBalances!.availableBalance));
+          void refetchStake();
         }
       } catch (error) {
-        console.error("Undelegation error:", error);
-        toast.error("Undelegation error");
+        console.error("Removing Stake error: ", error);
+        toast.error("Removing Stake error");
       }
     } else {
+      console.log("Validation failed:");
+      console.log("Entered amount to remove:", taoAmountBigInt.toString());
+      console.log(
+        "Staked amount that can be removed:",
+        stakingBalance?.toString(),
+      );
       toast.error("Please enter a valid amount");
     }
   };
@@ -210,10 +205,11 @@ export default function Staking() {
                       </label>
                       <div className="mt-2 flex items-center justify-between text-gray-200 sm:col-span-2 sm:mt-0">
                         <span>
-                          {(Number(stakingBalance) / 1e9).toFixed(4) ??
-                            "No staked balance"}{" "}
-                          Tao ||{" "}
-                          {price
+                          {stakingBalance
+                            ? (Number(stakingBalance) / 1e9).toFixed(4) + " Tao"
+                            : "No staked balance"}{" "}
+                          ||{" "}
+                          {price && stakingBalance
                             ? "$" +
                               ((Number(stakingBalance) / 1e9) * price).toFixed(
                                 2,
@@ -232,10 +228,11 @@ export default function Staking() {
                       </label>
                       <div className="mt-2 flex items-center justify-between text-gray-200 sm:col-span-2 sm:mt-0">
                         <span>
-                          {(Number(availableBalance) / 1e9).toFixed(4) ??
-                            "No available balance"}{" "}
+                          {availableBalance
+                            ? (Number(availableBalance) / 1e9).toFixed(4)
+                            : "No available balance"}{" "}
                           Tao ||{" "}
-                          {price
+                          {price && availableBalance
                             ? "$" +
                               (
                                 (Number(availableBalance) / 1e9) *
@@ -274,46 +271,22 @@ export default function Staking() {
                 </div>
                 <div className="flex justify-center gap-4">
                   <button
-                    className={`flex w-40 items-center justify-center gap-2 rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8 ${
-                      taoAmount !== "" &&
-                      !isNaN(parseFloat(taoAmount)) &&
-                      connectedAccount
-                        ? ""
-                        : "cursor-not-allowed opacity-60"
-                    }`}
-                    disabled={
-                      !(
-                        taoAmount !== "" &&
-                        !isNaN(parseFloat(taoAmount)) &&
-                        connectedAccount
-                      )
-                    }
+                    className="flex w-40 items-center justify-center gap-2 rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8"
+                    disabled={!connectedAccount || !taoAmount}
                     onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-                      handleDelegate(e)
+                      handleAddStake(e)
                     }
                   >
-                    Delegate
+                    Add Stake
                   </button>
                   <button
-                    className={`flex w-40 items-center justify-center gap-2 rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8 ${
-                      taoAmount !== "" &&
-                      !isNaN(parseFloat(taoAmount)) &&
-                      connectedAccount
-                        ? ""
-                        : "cursor-not-allowed opacity-60"
-                    }`}
-                    disabled={
-                      !(
-                        taoAmount !== "" &&
-                        !isNaN(parseFloat(taoAmount)) &&
-                        connectedAccount
-                      )
-                    }
+                    className="flex w-40 items-center justify-center gap-2 rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8"
+                    disabled={!connectedAccount || !taoAmount}
                     onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-                      handleUnDelegate(e)
+                      handleRemoveStake(e)
                     }
                   >
-                    Undelegate
+                    Remove Stake
                   </button>
                 </div>
               </div>

@@ -34,7 +34,9 @@ export default function WalletModal({
     useState<InjectedAccountWithMeta | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const setConnectedAccount = useWalletStore((state) => state.setConnectedAccount);
+  const setConnectedAccount = useWalletStore(
+    (state) => state.setConnectedAccount,
+  );
   const disconnectAccount = useWalletStore((state) => state.disconnectAccount);
 
   const handleConnect = async () => {

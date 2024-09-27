@@ -23,7 +23,7 @@ const defaultInitState: WalletState = {
 export const createWalletStore = (initState: WalletState = defaultInitState) =>
   create<WalletStore>((set) => ({
     ...initState,
-    
+
     // Action to set the connected account
     setConnectedAccount: (account: string) => {
       set({ connectedAccount: account });

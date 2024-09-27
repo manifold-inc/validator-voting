@@ -11,7 +11,7 @@ type Delegations = {
   connected_account: string | null;
   timestamp: Date;
   weights: Record<string, number>;
-  stake: number | null;
+  stake: bigint | null;
 };
 
 export default function Delegators() {
@@ -38,7 +38,7 @@ export default function Delegators() {
                 ]),
               )
             : {},
-          stake: item.stake ? parseFloat(item.stake) : null,
+          stake: item.stake,
         }),
       );
       setData(formattedData);
@@ -126,7 +126,7 @@ export default function Delegators() {
                       >
                         <td className="border-b px-4 py-2">{item.stake}</td>
                         <td className="border-b px-4 py-2">
-                          ${(item.stake! * price).toFixed(2)}
+                          ${((Number(item.stake!) / 1e9) * price).toFixed(2)}
                         </td>
                         <td className="border-b px-4 py-2">
                           {truncateAddress(item.connected_account!)}
