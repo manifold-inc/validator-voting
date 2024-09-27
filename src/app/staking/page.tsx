@@ -206,15 +206,8 @@ export default function Staking() {
                       <div className="mt-2 flex items-center justify-between text-gray-200 sm:col-span-2 sm:mt-0">
                         <span>
                           {stakingBalance
-                            ? (Number(stakingBalance) / 1e9).toFixed(4) + " Tao"
-                            : "No staked balance"}{" "}
-                          ||{" "}
-                          {price && stakingBalance
-                            ? "$" +
-                              ((Number(stakingBalance) / 1e9) * price).toFixed(
-                                2,
-                              )
-                            : "Loading..."}
+                            ? `${(Number(stakingBalance) / 1e9).toFixed(4)} Tao || $${((Number(stakingBalance) / 1e9) * price).toFixed(2)}`
+                            : "No staked balance"}
                         </span>
                       </div>
                     </div>
@@ -271,7 +264,7 @@ export default function Staking() {
                 </div>
                 <div className="flex justify-center gap-4">
                   <button
-                    className="flex w-40 items-center justify-center gap-2 rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8"
+                    className="flex w-40 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8"
                     disabled={!connectedAccount || !taoAmount}
                     onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
                       handleAddStake(e)
@@ -280,7 +273,7 @@ export default function Staking() {
                     Add Stake
                   </button>
                   <button
-                    className="flex w-40 items-center justify-center gap-2 rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8"
+                    className="flex w-40 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8"
                     disabled={!connectedAccount || !taoAmount}
                     onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
                       handleRemoveStake(e)
