@@ -84,7 +84,7 @@ export const createWalletStore = (initState: WalletState = defaultInitState) =>
         console.log("Account Info:", accountInfo);
 
         // Check if accountInfo and free balance exist
-        if (accountInfo ?? accountInfo.data ?? accountInfo.data.free) {
+        if (accountInfo?.data?.free) {
           const freeBalance = accountInfo.data.free;
           console.log("Free Balance:", freeBalance.toString());
 
