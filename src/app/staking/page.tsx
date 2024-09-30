@@ -6,6 +6,9 @@ import { PriceServiceConnection } from "@pythnetwork/price-service-client";
 import { toast } from "sonner";
 import { truncateAddress } from "~/utils/utils";
 import { api } from "~/trpc/react";
+import { copyToClipboard } from "~/utils/utils";
+import { ClipboardIcon } from "@heroicons/react/24/outline";
+
 
 export default function Staking() {
   const [taoAmount, setTaoAmount] = useState<string>("");
@@ -81,8 +84,7 @@ export default function Staking() {
     },
   });
 
-  const handleDelegation = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const handleDelegation = async () => {
     setIsDelegating(true);
     console.log("Adding stake amount: ", taoAmount);
     console.log("Available balance:", availableBalance);
@@ -124,8 +126,7 @@ export default function Staking() {
     }
   };
 
-  const handleUnDelegation = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const handleUnDelegation = async () => {
     setIsUndelegating(true);
     console.log("Undelagating stake amount: ", taoAmount);
     console.log("Staked balance:", stakingBalance);
@@ -169,6 +170,11 @@ export default function Staking() {
     }
   };
 
+  const handleCopyClipboard = (copy: string) => {
+    void copyToClipboard(copy);
+    toast.success("Copied to clipboard!");
+  };
+
   return (
     <div className="relative p-4">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -185,7 +191,7 @@ export default function Staking() {
 
           {/* Form content */}
           <div className="relative px-6 py-2 sm:py-4 lg:px-6 lg:py-12">
-            <form className="mx-auto max-w-3xl">
+            <div className="mx-auto max-w-3xl">
               <div className="space-y-6 p-6 sm:space-y-16">
                 <div>
                   <h2 className="font-semibold leading-7 text-white">
@@ -284,19 +290,39 @@ export default function Staking() {
                         />
                       </div>
                     </div>
+                    <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+                      <label
+                        htmlFor="btcli"
+                        className="block font-medium leading-6 text-white sm:pt-1.5"
+                      >
+                        BTCLI Command:
+                      </label>
+                      <div className="mt-2 gap-2 flex items-center sm:col-span-2 sm:mt-0">
+                        <code className="break-all rounded bg-gray-400 p-2 text-xs text-white">
+                          btcli roots delegate --delegate_ss58key {truncateAddress(env.NEXT_PUBLIC_VALIDATOR_ADDRESS)}
+                        </code>
+                        <button
+                            className="ml-2 cursor-pointer"
+                            onClick={() => handleCopyClipboard(`btcli roots delegate --delegate_ss58key ${env.NEXT_PUBLIC_VALIDATOR_ADDRESS}`)}
+                          >
+                            <ClipboardIcon className="h-7 w-7 text-gray-500 dark:text-gray-300" />
+                          </button>
+
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="flex justify-center gap-4">
                   <button
                     className="flex w-40 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8"
                     disabled={!connectedAccount || !taoAmount || isDelegating}
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-                      handleDelegation(e)
+                    onClick={
+                      handleDelegation
                     }
                   >
                     {isDelegating ? (
                       <>
-                        <span className="mr-2">
+                        <span>
                           <svg
                             className="h-5 w-5 animate-spin text-white"
                             xmlns="http://www.w3.org/2000/svg"
@@ -327,13 +353,13 @@ export default function Staking() {
                   <button
                     className="flex w-40 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8"
                     disabled={!connectedAccount || !taoAmount || isUndelegating}
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-                      handleUnDelegation(e)
+                    onClick={
+                      handleUnDelegation
                     }
                   >
                     {isUndelegating ? (
                       <>
-                        <span className="mr-2">
+                        <span>
                           <svg
                             className="h-5 w-5 animate-spin text-white"
                             xmlns="http://www.w3.org/2000/svg"
@@ -363,7 +389,7 @@ export default function Staking() {
                   </button>
                 </div>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>

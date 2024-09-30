@@ -122,9 +122,15 @@ export default function Delegators() {
                       <tr
                         key={item.ud_nanoid}
                         onClick={() =>
-                          setExpandedRow(expandedRow === index ? null : index)
+                          Object.keys(item.weights).length > 0
+                            ? setExpandedRow(expandedRow === index ? null : index)
+                            : null
                         }
-                        className="cursor-pointer hover:bg-indigo-800"
+                        className={
+                          Object.keys(item.weights).length > 0
+                            ? "cursor-pointer hover:bg-indigo-800"
+                            : ""
+                        }
                       >
                         <td className="border-b px-4 py-2">
                           {Number(item.stake!) / 1e9}
@@ -168,20 +174,20 @@ export default function Delegators() {
                               ]}
                             />
                           ) : (
-                            <span className="text-sm text-gray-300">
+                            <span className="text-sm text-gray-300 px-4 py-3">
                               No weights assigned
                             </span>
                           )}
                         </td>
                       </tr>
-                      {expandedRow === index && (
+                      {expandedRow === index && Object.keys(item.weights).length > 0 && (
                         <tr>
                           <td colSpan={5} className="border-b px-4 py-4">
                             <div className="flex flex-row items-center justify-center gap-4">
                               <div className="mt-4">
-                                <h3 className="mb-2 text-lg font-semibold">
+                                <p className="mb-2 text-lg font-semibold">
                                   Allocated Weights:
-                                </h3>
+                                </p>
                                 <ul>
                                   {Object.entries(item.weights).map(
                                     ([key, value], idx) => (

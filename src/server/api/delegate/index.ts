@@ -158,6 +158,7 @@ export const delegateRouter = createTRPCRouter({
           timestamp: userDelegation.created_at,
         })
         .from(userDelegation)
+        .orderBy(desc(userDelegation.created_at))
         .execute();
 
       console.log(
