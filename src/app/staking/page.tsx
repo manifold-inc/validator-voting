@@ -6,13 +6,14 @@ import { PriceServiceConnection } from "@pythnetwork/price-service-client";
 import { toast } from "sonner";
 import { truncateAddress } from "~/utils/utils";
 import { api } from "~/trpc/react";
-import { addStake, fetchBalance, removeStake } from "~/utils/polkadotAPI";
 
 export default function Staking() {
   const [taoAmount, setTaoAmount] = useState<string>("");
   const [price, setPrice] = useState(0);
   const [stakingBalance, setStakingBalance] = useState<bigint | null>(null);
   const [availableBalance, setAvailableBalance] = useState<bigint | null>(null);
+  const [isDelegating, setIsDelegating] = useState<boolean>(false);
+  const [isUndelegating, setIsUndelegating] = useState<boolean>(false);
 
   const connectedAccount = useWalletStore((state) => state.connectedAccount);
 
@@ -44,6 +45,7 @@ export default function Staking() {
   useEffect(() => {
     if (!connectedAccount) return;
     const updateBalances = async () => {
+      const { fetchBalance } = await import("~/utils/polkadotAPI");
       const balances = await fetchBalance(connectedAccount);
       setAvailableBalance(BigInt(balances!.availableBalance));
     };
@@ -64,16 +66,24 @@ export default function Staking() {
   }, [stakeData]);
 
   const applyStakeMutation = api.delegate.addDelegateStake.useMutation({
+    onMutate: (variables) => {
+      console.log("Mutation variables: ", {
+        ...variables,
+      });
+      console.log("Stake type: ", typeof variables.stake);
+    },
     onSuccess: () => {
       setTaoAmount("");
+      void refetchStake();
     },
     onError: (error) => {
       toast.error(`Error applying stake to DB: ${error.message}`);
     },
   });
 
-  const handleAddStake = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleDelegation = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    setIsDelegating(true);
     console.log("Adding stake amount: ", taoAmount);
     console.log("Available balance:", availableBalance);
 
@@ -81,58 +91,80 @@ export default function Staking() {
 
     if (taoAmountBigInt <= availableBalance!) {
       try {
-        const success = await addStake(connectedAccount!, taoAmountBigInt);
-        if (success) {
+        const { addStake, fetchBalance } = await import("~/utils/polkadotAPI");
+        const txHash = await addStake(connectedAccount!, taoAmountBigInt);
+        if (txHash) {
+          toast.success(
+            `Stake added successfully. Transaction hash: ${txHash}`,
+          );
           applyStakeMutation.mutate({
             connected_account: connectedAccount!,
             stake: taoAmountBigInt,
+            txHash: txHash,
           });
           const newBalances = await fetchBalance(connectedAccount!);
           setAvailableBalance(BigInt(newBalances!.availableBalance));
-          void refetchStake();
+        } else {
+          toast.error("Failed to add stake.");
         }
       } catch (error) {
         console.error("Adding Stake error: ", error);
-        toast.error("Adding Stake error");
+        toast.error(
+          `Adding Stake error: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      } finally {
+        setIsDelegating(false);
       }
     } else {
       console.log("Validation failed:");
       console.log("Entered amount:", taoAmountBigInt.toString());
       console.log("Available amount:", availableBalance?.toString());
+      setIsDelegating(false);
       toast.error("Please enter a valid amount");
     }
   };
 
-  const handleRemoveStake = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleUnDelegation = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    console.log("Removing stake amount: ", taoAmount);
+    setIsUndelegating(true);
+    console.log("Undelagating stake amount: ", taoAmount);
     console.log("Staked balance:", stakingBalance);
 
     const taoAmountBigInt = BigInt(Math.floor(parseFloat(taoAmount) * 1e9));
 
     if (taoAmountBigInt <= stakingBalance!) {
       try {
-        const success = await removeStake(connectedAccount!, taoAmountBigInt);
-        if (success) {
+        const { removeStake, fetchBalance } = await import(
+          "~/utils/polkadotAPI"
+        );
+        const txHash = await removeStake(connectedAccount!, taoAmountBigInt);
+        if (txHash) {
+          toast.success(
+            `Stake added successfully. Transaction hash: ${txHash}`,
+          );
           applyStakeMutation.mutate({
             connected_account: connectedAccount!,
-            stake: taoAmountBigInt,
+            stake: stakingBalance! - taoAmountBigInt,
+            txHash: txHash,
           });
           const newBalances = await fetchBalance(connectedAccount!);
           setAvailableBalance(BigInt(newBalances!.availableBalance));
-          void refetchStake();
+        } else {
+          toast.error("Failed to undelegate stake.");
         }
       } catch (error) {
         console.error("Removing Stake error: ", error);
-        toast.error("Removing Stake error");
+        toast.error(
+          `Removing error: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      } finally {
+        setIsUndelegating(false);
       }
     } else {
       console.log("Validation failed:");
-      console.log("Entered amount to remove:", taoAmountBigInt.toString());
-      console.log(
-        "Staked amount that can be removed:",
-        stakingBalance?.toString(),
-      );
+      console.log("Entered amount:", taoAmountBigInt.toString());
+      console.log("Available amount:", availableBalance?.toString());
+      setIsUndelegating(false);
       toast.error("Please enter a valid amount");
     }
   };
@@ -222,16 +254,8 @@ export default function Staking() {
                       <div className="mt-2 flex items-center justify-between text-gray-200 sm:col-span-2 sm:mt-0">
                         <span>
                           {availableBalance
-                            ? (Number(availableBalance) / 1e9).toFixed(4)
-                            : "No available balance"}{" "}
-                          Tao ||{" "}
-                          {price && availableBalance
-                            ? "$" +
-                              (
-                                (Number(availableBalance) / 1e9) *
-                                price
-                              ).toFixed(2)
-                            : "Loading..."}
+                            ? `${(Number(availableBalance) / 1e9).toFixed(4)} Tao || $${((Number(availableBalance) / 1e9) * price).toFixed(2)}`
+                            : "No available balance"}
                         </span>
                       </div>
                     </div>
@@ -265,21 +289,77 @@ export default function Staking() {
                 <div className="flex justify-center gap-4">
                   <button
                     className="flex w-40 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8"
-                    disabled={!connectedAccount || !taoAmount}
+                    disabled={!connectedAccount || !taoAmount || isDelegating}
                     onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-                      handleAddStake(e)
+                      handleDelegation(e)
                     }
                   >
-                    Add Stake
+                    {isDelegating ? (
+                      <>
+                        <span className="mr-2">
+                          <svg
+                            className="h-5 w-5 animate-spin text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                        </span>
+                        Delegating...
+                      </>
+                    ) : (
+                      "Delegate"
+                    )}
                   </button>
                   <button
                     className="flex w-40 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8"
-                    disabled={!connectedAccount || !taoAmount}
+                    disabled={!connectedAccount || !taoAmount || isUndelegating}
                     onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-                      handleRemoveStake(e)
+                      handleUnDelegation(e)
                     }
                   >
-                    Remove Stake
+                    {isUndelegating ? (
+                      <>
+                        <span className="mr-2">
+                          <svg
+                            className="h-5 w-5 animate-spin text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                        </span>
+                        Undelegating...
+                      </>
+                    ) : (
+                      "Undelegate"
+                    )}
                   </button>
                 </div>
               </div>

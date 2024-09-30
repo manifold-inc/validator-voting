@@ -2,13 +2,22 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { z } from "zod";
 import { userDelegation, genId } from "~/server/schema/schema";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 const logError = (procedureName: string, error: unknown) => {
   console.error(`Error in ${procedureName}:`, error);
   if (error instanceof Error) {
     console.error(`Stack trace: ${error.stack}`);
   }
+};
+
+const safeStringify = (obj: unknown): string => {
+  return JSON.stringify(
+    obj,
+    (_, value): string | number | boolean | null =>
+      typeof value === "bigint" ? value.toString() : value,
+    2,
+  );
 };
 
 export const delegateRouter = createTRPCRouter({
@@ -42,19 +51,20 @@ export const delegateRouter = createTRPCRouter({
         );
 
         // Check if the connected account exists
-        const existingDelegation = await ctx.db
+        const latestDelegation = await ctx.db
           .select()
           .from(userDelegation)
           .where(eq(userDelegation.connected_account, input.connected_account))
+          .orderBy(desc(userDelegation.created_at))
           .limit(1)
           .execute();
 
         let result;
-        if (existingDelegation.length > 0) {
+        if (latestDelegation.length > 0) {
           // Update existing record
           result = await ctx.db
             .update(userDelegation)
-            .set({ weights: weightsRecord, updated_at: new Date() })
+            .set({ weights: weightsRecord })
             .where(
               eq(userDelegation.connected_account, input.connected_account),
             )
@@ -63,7 +73,7 @@ export const delegateRouter = createTRPCRouter({
             `[addDelegateWeights] Operation successful. Result:`,
             JSON.stringify(result, null, 2),
           );
-          return { success: true, ud_nanoid: existingDelegation[0]!.ud_nanoid };
+          return { success: true, ud_nanoid: latestDelegation[0]!.ud_nanoid };
         } else {
           // Insert new record
           const ud_nanoid = genId.userDelegation();
@@ -97,93 +107,38 @@ export const delegateRouter = createTRPCRouter({
       z.object({
         connected_account: z.string(),
         stake: z.bigint(),
-        removeStake: z.boolean().optional(),
+        txHash: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      console.log(`[addDelegateStake] Input:`, JSON.stringify(input, null, 2));
+      console.log(`[addDelegateStake] Input:`, safeStringify(input));
+      console.log(`[addDelegateStake] Stake type:`, typeof input.stake);
       try {
-        console.log("Attempting to update or insert stake:", input);
+        console.log("Attempting to insert new stake record:", input);
 
-        // Check if the connected account exists
-        const existingDelegation = await ctx.db
-          .select()
-          .from(userDelegation)
-          .where(eq(userDelegation.connected_account, input.connected_account))
-          .limit(1)
+        // Insert new record
+        const ud_nanoid = genId.userDelegation();
+        const result = await ctx.db
+          .insert(userDelegation)
+          .values({
+            ud_nanoid: ud_nanoid,
+            connected_account: input.connected_account,
+            stake: input.stake,
+            txHash: input.txHash,
+          })
           .execute();
 
-        let result;
-        if (existingDelegation.length > 0) {
-          if (Number(existingDelegation[0]!.stake) - Number(input.stake) < 0) {
-            throw new TRPCError({
-              code: "BAD_REQUEST",
-              message: "Insufficient stake to remove",
-            });
-          }
-          if (Number(existingDelegation[0]!.stake) - Number(input.stake) < 0) {
-            // Delete the record if the resulting stake is zero
-            result = await ctx.db
-              .delete(userDelegation)
-              .where(
-                eq(userDelegation.connected_account, input.connected_account),
-              )
-              .execute();
-            console.log(
-              `[addDelegateStake] Operation successful. Result:`,
-              JSON.stringify(result, null, 2),
-            );
-            return { success: true };
-          } else {
-            // Update existing record
-            result = await ctx.db
-              .update(userDelegation)
-              .set({
-                stake: existingDelegation[0]!.stake! - input.stake,
-                updated_at: new Date(),
-              })
-              .where(
-                eq(userDelegation.connected_account, input.connected_account),
-              )
-              .execute();
-            console.log(
-              `[addDelegateStake] Operation successful. Result:`,
-              JSON.stringify(result, null, 2),
-            );
-            return {
-              success: true,
-              ud_nanoid: existingDelegation[0]!.ud_nanoid,
-            };
-          }
-        } else {
-          if (input.removeStake) {
-            throw new TRPCError({
-              code: "NOT_FOUND",
-              message: "Cannot remove stake from non-existent account",
-            });
-          }
-          // Insert new record
-          const ud_nanoid = genId.userDelegation();
-          result = await ctx.db
-            .insert(userDelegation)
-            .values({
-              ud_nanoid: ud_nanoid,
-              connected_account: input.connected_account,
-              stake: input.stake,
-            })
-            .execute();
-          console.log(
-            `[addDelegateStake] Operation successful. Result:`,
-            JSON.stringify(result, null, 2),
-          );
-          return { success: true, ud_nanoid };
-        }
+        console.log(
+          `[addDelegateStake] Operation successful. Result:`,
+          safeStringify(result),
+        );
+        return { success: true, ud_nanoid, stake: input.stake.toString() };
       } catch (error) {
         logError("addDelegateStake", error);
         if (error instanceof TRPCError) throw error;
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to update or insert delegation stake",
+          message: "Failed to insert delegation stake",
           cause: error,
         });
       }
@@ -196,10 +151,11 @@ export const delegateRouter = createTRPCRouter({
     try {
       const result = await ctx.db
         .select({
+          ud_nanoid: userDelegation.ud_nanoid,
           connected_account: userDelegation.connected_account,
           weights: userDelegation.weights,
           stake: userDelegation.stake,
-          timestamp: userDelegation.updated_at,
+          timestamp: userDelegation.created_at,
         })
         .from(userDelegation)
         .execute();
@@ -233,6 +189,8 @@ export const delegateRouter = createTRPCRouter({
           .select({ stake: userDelegation.stake })
           .from(userDelegation)
           .where(eq(userDelegation.connected_account, input.connected_account))
+          .orderBy(desc(userDelegation.created_at))
+          .limit(1)
           .execute();
 
         console.log(

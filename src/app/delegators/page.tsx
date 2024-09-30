@@ -8,6 +8,7 @@ import { PriceServiceConnection } from "@pythnetwork/price-service-client";
 import { truncateAddress } from "~/utils/utils";
 
 type Delegations = {
+  ud_nanoid: string;
   connected_account: string | null;
   timestamp: Date;
   weights: Record<string, number>;
@@ -39,6 +40,7 @@ export default function Delegators() {
               )
             : {},
           stake: item.stake,
+          ud_nanoid: item.ud_nanoid,
         }),
       );
       setData(formattedData);
@@ -118,13 +120,15 @@ export default function Delegators() {
                   {filteredData.map((item, index) => (
                     <>
                       <tr
-                        key={index}
+                        key={item.ud_nanoid}
                         onClick={() =>
                           setExpandedRow(expandedRow === index ? null : index)
                         }
                         className="cursor-pointer hover:bg-indigo-800"
                       >
-                        <td className="border-b px-4 py-2">{item.stake}</td>
+                        <td className="border-b px-4 py-2">
+                          {Number(item.stake!) / 1e9}
+                        </td>
                         <td className="border-b px-4 py-2">
                           ${((Number(item.stake!) / 1e9) * price).toFixed(2)}
                         </td>

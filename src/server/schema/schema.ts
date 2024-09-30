@@ -9,9 +9,9 @@ export const genId = {
 
 export const userDelegation = pgTable("user_delegation", {
   ud_nanoid: varchar("ud_nanoid", { length: 30 }).primaryKey(),
+  txHash: varchar("tx_hash", { length: 66 }),
   connected_account: varchar("connected_account", { length: 256 }),
   weights: json("weights").$type<Record<string, number>>(),
   stake: bigint("stake", { mode: "bigint" }),
-  updated_at: timestamp("updated_at"),
   created_at: timestamp("created_at").defaultNow(),
 });
