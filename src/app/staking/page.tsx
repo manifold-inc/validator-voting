@@ -242,10 +242,14 @@ export default function Staking() {
                         Staked:
                       </label>
                       <div className="mt-2 flex items-center justify-between text-gray-200 sm:col-span-2 sm:mt-0">
-                        <span>
+                        <span className="group relative">
                           {stakingBalance
                             ? `${(Number(stakingBalance) / 1e9).toFixed(4)} Tao || $${((Number(stakingBalance) / 1e9) * price).toFixed(2)}`
                             : "No staked balance"}
+                          <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-400 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                            This is the staked balance in the database for this validator.
+                            It may not reflect the actual staked balance on the chain.
+                          </span>
                         </span>
                       </div>
                     </div>
