@@ -6,78 +6,49 @@ import { api } from "~/trpc/react";
 import { format } from "date-fns";
 import { PriceServiceConnection } from "@pythnetwork/price-service-client";
 import { truncateAddress } from "~/utils/utils";
+import { useQuery } from "@tanstack/react-query";
 
-type Delegations = {
-  ud_nanoid: string;
-  connected_account: string | null;
-  timestamp: Date;
-  weights: Record<string, number>;
-  stake: bigint | null;
+const fetchPrice = async () => {
+  try {
+    const connection = new PriceServiceConnection(
+      "https://hermes.pyth.network",
+    );
+
+    const priceID = [
+      "0x410f41de235f2db824e562ea7ab2d3d3d4ff048316c61d629c0b93f58584e1af",
+    ];
+    const currentPrices = await connection.getLatestPriceFeeds(priceID);
+
+    return (
+      currentPrices?.[0]?.getPriceUnchecked().getPriceAsNumberUnchecked() ?? 0
+    );
+  } catch (err) {
+    console.error("Error fetching tao price:", err);
+  }
 };
 
 export default function Delegators() {
-  const [data, setData] = useState<Delegations[]>([]);
   const [searchAddress, setSearchAddress] = useState<string>("");
-  const [price, setPrice] = useState<number>(0);
+  const { data: pythPrice } = useQuery({
+    queryKey: ["fetch.pyth.price"],
+    queryFn: fetchPrice,
+  });
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
-  const { data: delegateData, isLoading } =
+  const { data, isLoading } =
     api.delegate.getAllDelegateWeightsAndStakes.useQuery();
-
-  useEffect(() => {
-    if (delegateData) {
-      const formattedData = delegateData.delegateWeightsAndStakes.map(
-        (item) => ({
-          ...item,
-          timestamp: new Date(item.timestamp!),
-          weights: item.weights
-            ? Object.fromEntries(
-                Object.entries(item.weights).map(([key, value]) => [
-                  key,
-                  value,
-                ]),
-              )
-            : {},
-          stake: item.stake,
-          ud_nanoid: item.ud_nanoid,
-        }),
-      );
-      setData(formattedData);
-    }
-  }, [delegateData]);
-
-  useEffect(() => {
-    const fetchPrice = async () => {
-      try {
-        const connection = new PriceServiceConnection(
-          "https://hermes.pyth.network",
-        );
-
-        const priceID = [
-          "0x410f41de235f2db824e562ea7ab2d3d3d4ff048316c61d629c0b93f58584e1af",
-        ];
-        const currentPrices = await connection.getLatestPriceFeeds(priceID);
-
-        setPrice(
-          currentPrices?.[0]?.getPriceUnchecked().getPriceAsNumberUnchecked() ??
-            0,
-        );
-      } catch (err) {
-        console.error("Error fetching tao price:", err);
-      }
-    };
-
-    void fetchPrice();
-  }, []);
 
   const safeValueFormatter = (value: number | string) => {
     const num = typeof value === "string" ? parseFloat(value) : value;
     return isNaN(num) ? "0.00%" : `${num.toFixed(2)}%`;
   };
 
-  const filteredData = data.filter((item) =>
-    item.connected_account!.toLowerCase().includes(searchAddress.toLowerCase()),
-  );
-
+  const filteredData =
+    data?.filter((item) =>
+      item
+        .connected_account!.toLowerCase()
+        .includes(searchAddress.toLowerCase()),
+    ) ?? [];
+  const price = pythPrice ?? 0;
   return (
     <div className="relative p-4">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -121,7 +92,9 @@ export default function Delegators() {
                         key={item.ud_nanoid}
                         onClick={() =>
                           Object.keys(item.weights).length > 0
-                            ? setExpandedRow(expandedRow === index ? null : index)
+                            ? setExpandedRow(
+                              expandedRow === index ? null : index,
+                            )
                             : null
                         }
                         className={
@@ -172,59 +145,60 @@ export default function Delegators() {
                               ]}
                             />
                           ) : (
-                            <span className="text-sm text-gray-300 px-4 py-3">
+                            <span className="px-4 py-3 text-sm text-gray-300">
                               No weights assigned
                             </span>
                           )}
                         </td>
                       </tr>
-                      {expandedRow === index && Object.keys(item.weights).length > 0 && (
-                        <tr>
-                          <td colSpan={5} className="border-b px-4 py-4">
-                            <div className="flex flex-row items-center justify-center gap-4">
-                              <div className="mt-4">
-                                <p className="mb-2 text-lg font-semibold">
-                                  Allocated Weights:
-                                </p>
-                                <ul>
-                                  {Object.entries(item.weights).map(
-                                    ([key, value], idx) => (
-                                      <li key={idx} className="mb-1">
-                                        {key}: {safeValueFormatter(value)}
-                                      </li>
-                                    ),
+                      {expandedRow === index &&
+                        Object.keys(item.weights).length > 0 && (
+                          <tr>
+                            <td colSpan={5} className="border-b px-4 py-4">
+                              <div className="flex flex-row items-center justify-center gap-4">
+                                <div className="mt-4">
+                                  <p className="mb-2 text-lg font-semibold">
+                                    Allocated Weights:
+                                  </p>
+                                  <ul>
+                                    {Object.entries(item.weights).map(
+                                      ([key, value], idx) => (
+                                        <li key={idx} className="mb-1">
+                                          {key}: {safeValueFormatter(value)}
+                                        </li>
+                                      ),
+                                    )}
+                                  </ul>
+                                </div>
+                                <DonutChart
+                                  data={Object.entries(item.weights).map(
+                                    ([key, value]) => ({
+                                      name: key,
+                                      value: Number(value),
+                                    }),
                                   )}
-                                </ul>
+                                  category="value"
+                                  index="name"
+                                  valueFormatter={safeValueFormatter}
+                                  className="mb-4 h-64 w-64"
+                                  colors={[
+                                    "lime",
+                                    "slate",
+                                    "indigo",
+                                    "violet",
+                                    "cyan",
+                                    "amber",
+                                    "emerald",
+                                    "teal",
+                                    "yellow",
+                                    "orange",
+                                    "red",
+                                  ]}
+                                />
                               </div>
-                              <DonutChart
-                                data={Object.entries(item.weights).map(
-                                  ([key, value]) => ({
-                                    name: key,
-                                    value: Number(value),
-                                  }),
-                                )}
-                                category="value"
-                                index="name"
-                                valueFormatter={safeValueFormatter}
-                                className="mb-4 h-64 w-64"
-                                colors={[
-                                  "lime",
-                                  "slate",
-                                  "indigo",
-                                  "violet",
-                                  "cyan",
-                                  "amber",
-                                  "emerald",
-                                  "teal",
-                                  "yellow",
-                                  "orange",
-                                  "red",
-                                ]}
-                              />
-                            </div>
-                          </td>
-                        </tr>
-                      )}
+                            </td>
+                          </tr>
+                        )}
                     </>
                   ))}
                 </tbody>

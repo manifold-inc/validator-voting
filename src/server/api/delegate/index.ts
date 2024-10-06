@@ -137,7 +137,18 @@ export const delegateRouter = createTRPCRouter({
         .orderBy(desc(userDelegation.created_at))
         .execute();
 
-      return { delegateWeightsAndStakes: result };
+      const formattedData = result.map((item) => ({
+        ...item,
+        timestamp: new Date(item.timestamp!),
+        weights: item.weights
+          ? Object.fromEntries(
+            Object.entries(item.weights).map(([key, value]) => [key, value]),
+          )
+          : {},
+        stake: item.stake,
+        ud_nanoid: item.ud_nanoid,
+      }));
+      return formattedData;
     } catch (error) {
       logError("getAllDelegateWeightsAndStakes", error);
       throw new TRPCError({
