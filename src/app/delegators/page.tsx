@@ -23,8 +23,6 @@ export default function Delegators() {
   const { data: delegateData, isLoading } =
     api.delegate.getAllDelegateWeightsAndStakes.useQuery();
 
-  console.log("delegateData", delegateData);
-
   useEffect(() => {
     if (delegateData) {
       const formattedData = delegateData.delegateWeightsAndStakes.map(

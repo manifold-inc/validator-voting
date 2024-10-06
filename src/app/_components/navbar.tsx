@@ -20,16 +20,15 @@ const navigation = [
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
 
-  const handleConnectionChange = (connected: boolean) => {
-    setIsConnected(connected);
-  };
   const openWalletModal = () => setIsWalletModalOpen(true);
   const closeWalletModal = () => setIsWalletModalOpen(false);
 
   const { connectedAccount } = useWalletStore((state) => state);
-  console.log(connectedAccount);
+
+  const address = connectedAccount
+    ? `${connectedAccount.substring(0, 5)}...${connectedAccount.substring(connectedAccount.length - 5)}`
+    : "Conect Wallet";
 
   return (
     <header className="bg-white">
@@ -70,11 +69,7 @@ export default function Navbar() {
             onClick={openWalletModal}
             className="flex gap-2 text-sm font-semibold leading-6 text-black hover:underline"
           >
-            {isConnected
-              ? connectedAccount?.substring(0, 5) +
-                "..." +
-                connectedAccount?.substring(connectedAccount?.length - 5)
-              : "Connect Wallet"}
+            {address}
             <WalletIcon className="h-6 w-6" />
           </button>
         </div>
@@ -118,22 +113,14 @@ export default function Navbar() {
                   onClick={openWalletModal}
                   className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                 >
-                  {isConnected
-                    ? connectedAccount?.substring(0, 6) +
-                      "..." +
-                      connectedAccount?.substring(connectedAccount?.length - 4)
-                    : "Connect Wallet"}
+                  {address}
                 </button>
               </div>
             </div>
           </div>
         </DialogPanel>
       </Dialog>
-      <WalletModal
-        isOpen={isWalletModalOpen}
-        onClose={closeWalletModal}
-        onConnectionChange={handleConnectionChange}
-      />
+      <WalletModal isOpen={isWalletModalOpen} onClose={closeWalletModal} />
     </header>
   );
 }

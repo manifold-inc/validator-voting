@@ -9,7 +9,6 @@ import { api } from "~/trpc/react";
 import { copyToClipboard } from "~/utils/utils";
 import { ClipboardIcon } from "@heroicons/react/24/outline";
 
-
 export default function Staking() {
   const [taoAmount, setTaoAmount] = useState<string>("");
   const [price, setPrice] = useState(0);
@@ -35,7 +34,7 @@ export default function Staking() {
 
         setPrice(
           currentPrices?.[0]?.getPriceUnchecked().getPriceAsNumberUnchecked() ??
-            0,
+          0,
         );
       } catch (err) {
         console.error("Error fetching tao price:", err);
@@ -69,12 +68,6 @@ export default function Staking() {
   }, [stakeData]);
 
   const applyStakeMutation = api.delegate.addDelegateStake.useMutation({
-    onMutate: (variables) => {
-      console.log("Mutation variables: ", {
-        ...variables,
-      });
-      console.log("Stake type: ", typeof variables.stake);
-    },
     onSuccess: () => {
       setTaoAmount("");
       void refetchStake();
@@ -86,8 +79,6 @@ export default function Staking() {
 
   const handleDelegation = async () => {
     setIsDelegating(true);
-    console.log("Adding stake amount: ", taoAmount);
-    console.log("Available balance:", availableBalance);
 
     const taoAmountBigInt = BigInt(Math.floor(parseFloat(taoAmount) * 1e9));
 
@@ -118,9 +109,6 @@ export default function Staking() {
         setIsDelegating(false);
       }
     } else {
-      console.log("Validation failed:");
-      console.log("Entered amount:", taoAmountBigInt.toString());
-      console.log("Available amount:", availableBalance?.toString());
       setIsDelegating(false);
       toast.error("Please enter a valid amount");
     }
@@ -128,8 +116,6 @@ export default function Staking() {
 
   const handleUnDelegation = async () => {
     setIsUndelegating(true);
-    console.log("Undelagating stake amount: ", taoAmount);
-    console.log("Staked balance:", stakingBalance);
 
     const taoAmountBigInt = BigInt(Math.floor(parseFloat(taoAmount) * 1e9));
 
@@ -154,7 +140,6 @@ export default function Staking() {
           toast.error("Failed to undelegate stake.");
         }
       } catch (error) {
-        console.error("Removing Stake error: ", error);
         toast.error(
           `Removing error: ${error instanceof Error ? error.message : String(error)}`,
         );
@@ -162,17 +147,16 @@ export default function Staking() {
         setIsUndelegating(false);
       }
     } else {
-      console.log("Validation failed:");
-      console.log("Entered amount:", taoAmountBigInt.toString());
-      console.log("Available amount:", availableBalance?.toString());
       setIsUndelegating(false);
       toast.error("Please enter a valid amount");
     }
   };
 
   const handleCopyClipboard = (copy: string) => {
-    void copyToClipboard(copy);
-    toast.success("Copied to clipboard!");
+    // Wait to post success till we know it actually succeeded
+    void copyToClipboard(copy).then(() =>
+      toast.success("Copied to clipboard!"),
+    );
   };
 
   return (
@@ -246,9 +230,10 @@ export default function Staking() {
                           {stakingBalance
                             ? `${(Number(stakingBalance) / 1e9).toFixed(4)} Tao || $${((Number(stakingBalance) / 1e9) * price).toFixed(2)}`
                             : "No staked balance"}
-                          <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-400 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-                            This is the staked balance in the database for this validator.
-                            It may not reflect the actual staked balance on the chain.
+                          <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-gray-400 px-2 py-1 text-xs text-white group-hover:block">
+                            This is the staked balance in the database for this
+                            validator. It may not reflect the actual staked
+                            balance on the chain.
                           </span>
                         </span>
                       </div>
@@ -301,17 +286,21 @@ export default function Staking() {
                       >
                         BTCLI Command:
                       </label>
-                      <div className="mt-2 gap-2 flex items-center sm:col-span-2 sm:mt-0">
+                      <div className="mt-2 flex items-center gap-2 sm:col-span-2 sm:mt-0">
                         <code className="break-all rounded bg-gray-400 p-2 text-xs text-white">
-                          btcli roots delegate --delegate_ss58key {truncateAddress(env.NEXT_PUBLIC_VALIDATOR_ADDRESS)}
+                          btcli roots delegate --delegate_ss58key{" "}
+                          {truncateAddress(env.NEXT_PUBLIC_VALIDATOR_ADDRESS)}
                         </code>
                         <button
-                            className="ml-2 cursor-pointer"
-                            onClick={() => handleCopyClipboard(`btcli roots delegate --delegate_ss58key ${env.NEXT_PUBLIC_VALIDATOR_ADDRESS}`)}
-                          >
-                            <ClipboardIcon className="h-7 w-7 text-gray-500 dark:text-gray-300" />
-                          </button>
-
+                          className="ml-2 cursor-pointer"
+                          onClick={() =>
+                            handleCopyClipboard(
+                              `btcli roots delegate --delegate_ss58key ${env.NEXT_PUBLIC_VALIDATOR_ADDRESS}`,
+                            )
+                          }
+                        >
+                          <ClipboardIcon className="h-7 w-7 text-gray-500 dark:text-gray-300" />
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -320,9 +309,7 @@ export default function Staking() {
                   <button
                     className="flex w-40 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8"
                     disabled={!connectedAccount || !taoAmount || isDelegating}
-                    onClick={
-                      handleDelegation
-                    }
+                    onClick={handleDelegation}
                   >
                     {isDelegating ? (
                       <>
@@ -357,9 +344,7 @@ export default function Staking() {
                   <button
                     className="flex w-40 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8"
                     disabled={!connectedAccount || !taoAmount || isUndelegating}
-                    onClick={
-                      handleUnDelegation
-                    }
+                    onClick={handleUnDelegation}
                   >
                     {isUndelegating ? (
                       <>
@@ -400,3 +385,4 @@ export default function Staking() {
     </div>
   );
 }
+

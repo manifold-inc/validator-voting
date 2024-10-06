@@ -29,10 +29,6 @@ export const delegateRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      console.log(
-        `[addDelegateWeights] Input:`,
-        JSON.stringify(input, null, 2),
-      );
       try {
         const totalWeight = input.weights.reduce(
           (sum, weight) => sum + weight.weight,
@@ -45,7 +41,6 @@ export const delegateRouter = createTRPCRouter({
           });
         }
 
-        console.log("Attempting to update or insert weights:", input);
         const weightsRecord = Object.fromEntries(
           input.weights.map(({ subnet, weight }) => [subnet, weight]),
         );
@@ -69,10 +64,6 @@ export const delegateRouter = createTRPCRouter({
               eq(userDelegation.connected_account, input.connected_account),
             )
             .execute();
-          console.log(
-            `[addDelegateWeights] Operation successful. Result:`,
-            JSON.stringify(result, null, 2),
-          );
           return { success: true, ud_nanoid: latestDelegation[0]!.ud_nanoid };
         } else {
           // Insert new record
@@ -85,10 +76,6 @@ export const delegateRouter = createTRPCRouter({
               weights: weightsRecord,
             })
             .execute();
-          console.log(
-            `[addDelegateWeights] Operation successful. Result:`,
-            JSON.stringify(result, null, 2),
-          );
           return { success: true, ud_nanoid };
         }
       } catch (error) {
@@ -111,11 +98,7 @@ export const delegateRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      console.log(`[addDelegateStake] Input:`, safeStringify(input));
-      console.log(`[addDelegateStake] Stake type:`, typeof input.stake);
       try {
-        console.log("Attempting to insert new stake record:", input);
-
         // Insert new record
         const ud_nanoid = genId.userDelegation();
         const result = await ctx.db
@@ -128,10 +111,6 @@ export const delegateRouter = createTRPCRouter({
           })
           .execute();
 
-        console.log(
-          `[addDelegateStake] Operation successful. Result:`,
-          safeStringify(result),
-        );
         return { success: true, ud_nanoid, stake: input.stake.toString() };
       } catch (error) {
         logError("addDelegateStake", error);
@@ -145,9 +124,6 @@ export const delegateRouter = createTRPCRouter({
     }),
 
   getAllDelegateWeightsAndStakes: publicProcedure.query(async ({ ctx }) => {
-    console.log(
-      `[getAllDelegateWeightsAndStakes] Fetching all delegate weights and stakes`,
-    );
     try {
       const result = await ctx.db
         .select({
@@ -161,9 +137,6 @@ export const delegateRouter = createTRPCRouter({
         .orderBy(desc(userDelegation.created_at))
         .execute();
 
-      console.log(
-        `[getAllDelegateWeightsAndStakes] Fetched ${result.length} records`,
-      );
       return { delegateWeightsAndStakes: result };
     } catch (error) {
       logError("getAllDelegateWeightsAndStakes", error);
@@ -177,7 +150,6 @@ export const delegateRouter = createTRPCRouter({
   getDelegateStake: publicProcedure
     .input(z.object({ connected_account: z.string() }))
     .query(async ({ ctx, input }) => {
-      console.log(`[getDelegateStake] Input:`, JSON.stringify(input, null, 2));
       if (!input.connected_account) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -194,10 +166,6 @@ export const delegateRouter = createTRPCRouter({
           .limit(1)
           .execute();
 
-        console.log(
-          `[getDelegateStake] Stake retrieved:`,
-          result[0]?.stake ?? null,
-        );
         return { stake: result[0]?.stake ?? null };
       } catch (error) {
         logError("getDelegateStake", error);
