@@ -143,7 +143,7 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
                     : "Connect your Wallet"}
                 </DialogTitle>
                 <div className="mt-2">
-                  <p className="text-sm text-gray-500">
+                  <div className="text-sm text-gray-500">
                     {connectionState === "selecting" ? (
                       <div>
                         <p className="mb-2 text-sm text-gray-500">
@@ -155,7 +155,7 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
                             <button
                               key={account.address}
                               onClick={() => handleAccountSelect(account)}
-                              className="w-full rounded bg-gray-100 p-2 text-left text-black hover:bg-gray-200"
+                              className="w-full mt-1 rounded bg-gray-100 p-2 text-left text-black hover:bg-gray-200"
                             >
                               {account.meta.name} ({account.address.slice(0, 6)}
                               ...
@@ -183,7 +183,7 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
                         {errorMessage}
                       </p>
                     )}
-                  </p>
+                  </div>
                 </div>
               </div>
             </div>

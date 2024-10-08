@@ -168,7 +168,7 @@ export const delegateRouter = createTRPCRouter({
           .limit(1)
           .execute();
 
-        return { stake: result[0]?.stake ?? null };
+        return result[0]?.stake ?? null;
       } catch (error) {
         logError("getDelegateStake", error);
         throw new TRPCError({

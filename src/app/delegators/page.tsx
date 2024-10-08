@@ -1,31 +1,12 @@
 "use client";
 
 import { DonutChart } from "@tremor/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "~/trpc/react";
 import { format } from "date-fns";
-import { PriceServiceConnection } from "@pythnetwork/price-service-client";
 import { truncateAddress } from "~/utils/utils";
 import { useQuery } from "@tanstack/react-query";
-
-const fetchPrice = async () => {
-  try {
-    const connection = new PriceServiceConnection(
-      "https://hermes.pyth.network",
-    );
-
-    const priceID = [
-      "0x410f41de235f2db824e562ea7ab2d3d3d4ff048316c61d629c0b93f58584e1af",
-    ];
-    const currentPrices = await connection.getLatestPriceFeeds(priceID);
-
-    return (
-      currentPrices?.[0]?.getPriceUnchecked().getPriceAsNumberUnchecked() ?? 0
-    );
-  } catch (err) {
-    console.error("Error fetching tao price:", err);
-  }
-};
+import { fetchPrice } from "~/utils/fetchPrice";
 
 export default function Delegators() {
   const [searchAddress, setSearchAddress] = useState<string>("");
