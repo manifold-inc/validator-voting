@@ -172,7 +172,7 @@ export default function Staking() {
                       Your Address:
                     </label>
                     <span className="mt-2 text-gray-800 sm:col-span-2 sm:mt-0">
-                      <span className="hidden sm:inline font-mono">
+                      <span className="hidden font-mono sm:inline">
                         {connectedAccount}
                       </span>
                       <span className="inline sm:hidden">

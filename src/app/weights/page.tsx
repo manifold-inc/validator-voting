@@ -233,7 +233,7 @@ export default function WeightsPage() {
                       Number(weight) <= 0 ||
                       Number(weight) > 100
                     }
-                    className="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm enabled:hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                    className="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 enabled:hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                   >
                     Add Weight to Subnet
                   </button>
@@ -244,7 +244,7 @@ export default function WeightsPage() {
 
                 {subnetWeights.length > 0 && (
                   <>
-                    <p className="text-center pt-4 text-lg font-medium leading-6 text-white sm:text-left">
+                    <p className="pt-4 text-center text-lg font-medium leading-6 text-white sm:text-left">
                       Added Subnet Weights
                     </p>
                     <ul className="max-h-32 overflow-y-auto">
@@ -254,7 +254,7 @@ export default function WeightsPage() {
                           className="flex items-center justify-between pb-2"
                         >
                           <span className="text-sm text-gray-700">
-                           {item.weight}% {item.subnet}
+                            {item.weight}% {item.subnet}
                           </span>
                           <button
                             onClick={() => removeSubnetWeight(item.subnet)}

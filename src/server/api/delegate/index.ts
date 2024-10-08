@@ -123,8 +123,8 @@ export const delegateRouter = createTRPCRouter({
         timestamp: new Date(item.timestamp!),
         weights: item.weights
           ? Object.fromEntries(
-            Object.entries(item.weights).map(([key, value]) => [key, value]),
-          )
+              Object.entries(item.weights).map(([key, value]) => [key, value]),
+            )
           : {},
         stake: item.stake,
         ud_nanoid: item.ud_nanoid,

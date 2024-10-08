@@ -18,4 +18,3 @@ export const fetchPrice = async () => {
     console.error("Error fetching tao price:", err);
   }
 };
-

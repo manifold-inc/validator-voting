@@ -155,7 +155,7 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
                             <button
                               key={account.address}
                               onClick={() => handleAccountSelect(account)}
-                              className="w-full mt-1 rounded bg-gray-100 p-2 text-left text-black hover:bg-gray-200"
+                              className="mt-1 w-full rounded bg-gray-100 p-2 text-left text-black hover:bg-gray-200"
                             >
                               {account.meta.name} ({account.address.slice(0, 6)}
                               ...

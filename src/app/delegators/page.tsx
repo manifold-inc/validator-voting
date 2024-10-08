@@ -47,7 +47,7 @@ export default function Delegators() {
           {isLoading ? (
             <p className="text-black">Loading...</p>
           ) : (
-            <div className="w-full pt-8 overflow-scroll">
+            <div className="w-full overflow-scroll pt-8">
               <table className="min-w-full p-4 text-black">
                 <thead>
                   <tr>
@@ -66,8 +66,8 @@ export default function Delegators() {
                         onClick={() =>
                           Object.keys(item.weights).length > 0
                             ? setExpandedRow(
-                              expandedRow === index ? null : index,
-                            )
+                                expandedRow === index ? null : index,
+                              )
                             : null
                         }
                         className="cursor-pointer hover:bg-gray-100"
