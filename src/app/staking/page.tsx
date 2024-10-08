@@ -163,22 +163,12 @@ export default function Staking() {
     <div className="relative p-4">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Form container with gradient background */}
-        <div className="relative overflow-hidden shadow-xl sm:rounded-2xl">
-          {/* Gradient background on the form */}
-          <div className="absolute inset-0">
-            <div
-              className="h-full w-full bg-gradient-to-br from-indigo-900 via-indigo-600 to-indigo-400"
-              aria-hidden="true"
-            />
-            <div className="absolute inset-0 bg-black opacity-30 mix-blend-multiply" />
-          </div>
-
           {/* Form content */}
           <div className="relative px-6 py-2 sm:py-4 lg:px-6 lg:py-12">
             <div className="mx-auto max-w-3xl">
               <div className="space-y-6 p-6 sm:space-y-16">
                 <div>
-                  <h2 className="font-semibold leading-7 text-white">
+                  <h2 className="font-semibold leading-7 text-black">
                     Delegate to {env.NEXT_PUBLIC_VALIDATOR_NAME}
                   </h2>
 
@@ -186,11 +176,11 @@ export default function Staking() {
                     <div className="sm:grid sm:grid-cols-3 sm:items-center sm:gap-4 sm:py-6">
                       <label
                         htmlFor="validatorAddress"
-                        className="block font-medium leading-6 text-white sm:pt-1.5"
+                        className="block font-medium leading-6 text-black sm:pt-1.5"
                       >
                         Validator Address:
                       </label>
-                      <span className="mt-2 text-gray-200 sm:col-span-2 sm:mt-0">
+                      <span className="mt-2 text-gray-800 sm:col-span-2 sm:mt-0">
                         <span className="hidden sm:inline">
                           {env.NEXT_PUBLIC_VALIDATOR_ADDRESS}
                         </span>
@@ -203,11 +193,11 @@ export default function Staking() {
                     <div className="sm:grid sm:grid-cols-3 sm:items-center sm:gap-4 sm:py-6">
                       <label
                         htmlFor="yourAddress"
-                        className="block font-medium leading-6 text-white sm:pt-1.5"
+                        className="block font-medium leading-6 text-black sm:pt-1.5"
                       >
                         Your Address:
                       </label>
-                      <span className="mt-2 text-gray-200 sm:col-span-2 sm:mt-0">
+                      <span className="mt-2 text-gray-800 sm:col-span-2 sm:mt-0">
                         <span className="hidden sm:inline">
                           {connectedAccount}
                         </span>
@@ -221,16 +211,16 @@ export default function Staking() {
                     <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
                       <label
                         htmlFor="staked"
-                        className="block font-medium leading-6 text-white sm:pt-1.5"
+                        className="block font-medium leading-6 text-black sm:pt-1.5"
                       >
                         Staked:
                       </label>
-                      <div className="mt-2 flex items-center justify-between text-gray-200 sm:col-span-2 sm:mt-0">
+                      <div className="mt-2 flex items-center justify-between text-gray-800 sm:col-span-2 sm:mt-0">
                         <span className="group relative">
                           {stakingBalance
                             ? `${(Number(stakingBalance) / 1e9).toFixed(4)} Tao || $${((Number(stakingBalance) / 1e9) * price).toFixed(2)}`
                             : "No staked balance"}
-                          <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-gray-400 px-2 py-1 text-xs text-white group-hover:block">
+                          <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-gray-400 px-2 py-1 text-xs text-black group-hover:block">
                             This is the staked balance in the database for this
                             validator. It may not reflect the actual staked
                             balance on the chain.
@@ -242,11 +232,11 @@ export default function Staking() {
                     <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
                       <label
                         htmlFor="available"
-                        className="block font-medium leading-6 text-white sm:pt-1.5"
+                        className="block font-medium leading-6 text-black sm:pt-1.5"
                       >
                         Available:
                       </label>
-                      <div className="mt-2 flex items-center justify-between text-gray-200 sm:col-span-2 sm:mt-0">
+                      <div className="mt-2 flex items-center justify-between text-gray-800 sm:col-span-2 sm:mt-0">
                         <span>
                           {availableBalance
                             ? `${(Number(availableBalance) / 1e9).toFixed(4)} Tao || $${((Number(availableBalance) / 1e9) * price).toFixed(2)}`
@@ -258,7 +248,7 @@ export default function Staking() {
                     <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
                       <label
                         htmlFor="taoAmount"
-                        className="block font-medium leading-6 text-white sm:pt-1.5"
+                        className="block font-medium leading-6 text-black sm:pt-1.5"
                       >
                         Tao Amount:
                       </label>
@@ -275,19 +265,19 @@ export default function Staking() {
                               setTaoAmount(value);
                             }
                           }}
-                          className="flex rounded border border-gray-200 bg-transparent py-1.5 pl-1 text-white placeholder:text-gray-200 focus:ring-0 sm:text-sm sm:leading-6"
+                          className="flex rounded border border-gray-200 bg-transparent py-1.5 pl-1 text-black placeholder:text-gray-800 focus:ring-0 sm:text-sm sm:leading-6"
                         />
                       </div>
                     </div>
                     <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
                       <label
                         htmlFor="btcli"
-                        className="block font-medium leading-6 text-white sm:pt-1.5"
+                        className="block font-medium leading-6 text-black sm:pt-1.5"
                       >
                         BTCLI Command:
                       </label>
                       <div className="mt-2 flex items-center gap-2 sm:col-span-2 sm:mt-0">
-                        <code className="break-all rounded bg-gray-400 p-2 text-xs text-white">
+                        <code className="break-all rounded bg-gray-300 p-2 text-xs text-black">
                           btcli roots delegate --delegate_ss58key{" "}
                           {truncateAddress(env.NEXT_PUBLIC_VALIDATOR_ADDRESS)}
                         </code>
@@ -299,7 +289,7 @@ export default function Staking() {
                             )
                           }
                         >
-                          <ClipboardIcon className="h-7 w-7 text-gray-500 dark:text-gray-300" />
+                          <ClipboardIcon className="h-7 w-7 text-gray-500 dark:text-gray-700" />
                         </button>
                       </div>
                     </div>
@@ -307,7 +297,7 @@ export default function Staking() {
                 </div>
                 <div className="flex justify-center gap-4">
                   <button
-                    className="flex w-40 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8"
+                    className="flex disabled:opacity-75 w-40 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm enabled:hover:bg-indigo-600 sm:px-8"
                     disabled={!connectedAccount || !taoAmount || isDelegating}
                     onClick={handleDelegation}
                   >
@@ -342,7 +332,7 @@ export default function Staking() {
                     )}
                   </button>
                   <button
-                    className="flex w-40 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-600 sm:px-8"
+                    className="flex disabled:opacity-75  w-40 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-indigo-500 px-4 py-3 text-base font-medium text-white shadow-sm enabled:hover:bg-indigo-600 sm:px-8"
                     disabled={!connectedAccount || !taoAmount || isUndelegating}
                     onClick={handleUnDelegation}
                   >
@@ -380,7 +370,6 @@ export default function Staking() {
               </div>
             </div>
           </div>
-        </div>
       </div>
     </div>
   );

@@ -89,23 +89,15 @@ export default function WeightsPage() {
   return (
     <div className="relative p-4">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden shadow-xl sm:rounded-2xl">
-          <div className="absolute inset-0">
-            <div
-              className="h-full w-full bg-gradient-to-br from-indigo-900 via-indigo-600 to-indigo-400"
-              aria-hidden="true"
-            />
-            <div className="absolute inset-0 bg-black opacity-30 mix-blend-multiply" />
-          </div>
-
+        <div className="relative overflow-hidden">
           <div className="relative px-6 py-2 sm:py-4 lg:px-6 lg:py-12">
             <form className="mx-auto max-w-3xl">
               <div className="space-y-6 p-6">
                 <div>
-                  <h2 className="font-semibold leading-7 text-white">
+                  <h2 className="font-semibold leading-7">
                     Allocate Subnet Weights with your Stake
                   </h2>
-                  <p className="mt-2 text-sm text-gray-300">
+                  <p className="mt-2 text-sm text-gray-700">
                     Select the subnets where you&apos;d like to assign your
                     delegated TAO weight. The validator will incentivize subnets
                     based on every delegator&apos;s choice.
@@ -115,7 +107,7 @@ export default function WeightsPage() {
                     <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
                       <label
                         htmlFor="subnet"
-                        className="block font-medium leading-6 text-white sm:pt-1.5"
+                        className="block font-medium leading-6 text-black sm:pt-1.5"
                       >
                         Subnet
                       </label>
@@ -149,7 +141,7 @@ export default function WeightsPage() {
                           <div className="relative w-full">
                             <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-700 bg-white text-black shadow-lg">
                               {filteredSubnets.length === 0 ? (
-                                <div className="relative cursor-default select-none px-4 py-2 text-gray-400">
+                                <div className="relative cursor-default select-none px-4 py-2 text-gray-600">
                                   No results found.
                                 </div>
                               ) : (
@@ -208,7 +200,7 @@ export default function WeightsPage() {
                     <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
                       <label
                         htmlFor="weight"
-                        className="block font-medium leading-6 text-white sm:pt-1.5"
+                        className="block font-medium leading-6 text-black sm:pt-1.5"
                       >
                         Weight
                       </label>
@@ -220,7 +212,7 @@ export default function WeightsPage() {
                             id="weight"
                             value={weight}
                             onChange={handleWeightChange}
-                            className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-white placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                            className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-black placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                             placeholder="0.00"
                           />
                           <span className="flex select-none items-center pr-3 text-gray-500 sm:text-sm">
@@ -242,32 +234,32 @@ export default function WeightsPage() {
                       Number(weight) <= 0 ||
                       Number(weight) > 100
                     }
-                    className="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                    className="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm enabled:hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                   >
                     Add Weight to Subnet
                   </button>
-                  <p className="text-sm text-gray-300">
+                  <p className="text-sm text-gray-700">
                     Remaining: {100 - totalWeight}%
                   </p>
                 </div>
 
                 {subnetWeights.length > 0 && (
                   <>
-                    <p className="sticky top-0 text-center text-lg font-medium leading-6 text-white sm:text-left">
+                    <p className="text-center pt-4 text-lg font-medium leading-6 text-white sm:text-left">
                       Added Subnet Weights
                     </p>
-                    <ul className="max-h-32 divide-y divide-gray-300 overflow-y-auto">
+                    <ul className="max-h-32 overflow-y-auto">
                       {subnetWeights.map((item) => (
                         <li
                           key={item.subnet}
-                          className="flex items-center justify-between py-2"
+                          className="flex items-center justify-between pb-2"
                         >
-                          <span className="text-sm text-gray-300">
-                            {item.subnet}: {item.weight}%
+                          <span className="text-sm text-gray-700">
+                           {item.weight}% {item.subnet}
                           </span>
                           <button
                             onClick={() => removeSubnetWeight(item.subnet)}
-                            className="text-sm text-red-400 hover:text-red-300"
+                            className="text-sm text-red-400 hover:text-red-500"
                           >
                             Remove
                           </button>

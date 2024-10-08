@@ -11,15 +11,6 @@ const logError = (procedureName: string, error: unknown) => {
   }
 };
 
-const safeStringify = (obj: unknown): string => {
-  return JSON.stringify(
-    obj,
-    (_, value): string | number | boolean | null =>
-      typeof value === "bigint" ? value.toString() : value,
-    2,
-  );
-};
-
 export const delegateRouter = createTRPCRouter({
   addDelegateWeights: publicProcedure
     .input(
@@ -68,7 +59,7 @@ export const delegateRouter = createTRPCRouter({
         } else {
           // Insert new record
           const ud_nanoid = genId.userDelegation();
-          result = await ctx.db
+          await ctx.db
             .insert(userDelegation)
             .values({
               ud_nanoid: ud_nanoid,

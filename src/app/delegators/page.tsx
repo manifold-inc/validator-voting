@@ -51,38 +51,30 @@ export default function Delegators() {
   const price = pythPrice ?? 0;
   return (
     <div className="relative p-4">
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden shadow-xl sm:rounded-2xl">
-          <div className="absolute inset-0">
-            <div
-              className="h-full w-full bg-gradient-to-br from-indigo-900 via-indigo-600 to-indigo-400"
-              aria-hidden="true"
-            />
-            <div className="absolute inset-0 bg-black opacity-30 mix-blend-multiply" />
-          </div>
+      <div className="relative mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div className="relative flex flex-col items-center justify-center gap-2 py-2 text-center sm:py-4 lg:px-6 lg:py-12">
+          <p className="text-2xl font-semibold text-black">Delegators</p>
 
-          <div className="relative flex flex-col items-center justify-center gap-2 px-6 py-2 text-center sm:py-4 lg:px-6 lg:py-12">
-            <p className="text-2xl font-semibold text-white">Delegators</p>
+          <input
+            type="text"
+            placeholder="Search by account address"
+            value={searchAddress}
+            onChange={(e) => setSearchAddress(e.target.value)}
+            className="mb-4 w-full max-w-md rounded-md px-4 py-2 text-black placeholder:font-mono"
+          />
 
-            <input
-              type="text"
-              placeholder="Search by account address"
-              value={searchAddress}
-              onChange={(e) => setSearchAddress(e.target.value)}
-              className="mb-4 w-full max-w-md rounded-md px-4 py-2 text-black placeholder:font-mono"
-            />
-
-            {isLoading ? (
-              <p className="text-white">Loading...</p>
-            ) : (
-              <table className="min-w-full p-4 text-white">
+          {isLoading ? (
+            <p className="text-black">Loading...</p>
+          ) : (
+            <div className="w-full pt-8 overflow-scroll">
+              <table className="min-w-full p-4 text-black">
                 <thead>
                   <tr>
-                    <th className="border-b px-4 py-2">Stake</th>
-                    <th className="border-b px-4 py-2">USD</th>
-                    <th className="border-b px-4 py-2">Address</th>
-                    <th className="border-b px-4 py-2">Last Updated</th>
-                    <th className="border-b px-4 py-2">Weights</th>
+                    <th className="w-36 border-b px-4 py-2">Stake</th>
+                    <th className="w-36 border-b px-4 py-2">USD</th>
+                    <th className="w-36 border-b px-4 py-2">Address</th>
+                    <th className="w-36 border-b px-4 py-2">Last Updated</th>
+                    <th className="w-36 border-b px-4 py-2">Weights</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -97,11 +89,7 @@ export default function Delegators() {
                             )
                             : null
                         }
-                        className={
-                          Object.keys(item.weights).length > 0
-                            ? "cursor-pointer hover:bg-indigo-800"
-                            : ""
-                        }
+                        className="cursor-pointer hover:bg-gray-100"
                       >
                         <td className="border-b px-4 py-2">
                           {Number(item.stake!) / 1e9}
@@ -145,7 +133,7 @@ export default function Delegators() {
                               ]}
                             />
                           ) : (
-                            <span className="px-4 py-3 text-sm text-gray-300">
+                            <span className="px-4 py-3 text-sm text-gray-700">
                               No weights assigned
                             </span>
                           )}
@@ -203,8 +191,8 @@ export default function Delegators() {
                   ))}
                 </tbody>
               </table>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
