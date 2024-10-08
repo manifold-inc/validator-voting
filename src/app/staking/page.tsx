@@ -155,7 +155,7 @@ export default function Staking() {
                       Validator Address:
                     </label>
                     <span className="mt-2 text-gray-800 sm:col-span-2 sm:mt-0">
-                      <span className="hidden sm:inline">
+                      <span className="hidden font-mono sm:inline">
                         {env.NEXT_PUBLIC_VALIDATOR_ADDRESS}
                       </span>
                       <span className="inline sm:hidden">
@@ -172,7 +172,7 @@ export default function Staking() {
                       Your Address:
                     </label>
                     <span className="mt-2 text-gray-800 sm:col-span-2 sm:mt-0">
-                      <span className="hidden sm:inline">
+                      <span className="hidden sm:inline font-mono">
                         {connectedAccount}
                       </span>
                       <span className="inline sm:hidden">

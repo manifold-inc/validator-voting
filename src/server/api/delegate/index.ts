@@ -4,13 +4,6 @@ import { userDelegation, genId } from "~/server/schema/schema";
 import { TRPCError } from "@trpc/server";
 import { desc, eq } from "drizzle-orm";
 
-const logError = (procedureName: string, error: unknown) => {
-  console.error(`Error in ${procedureName}:`, error);
-  if (error instanceof Error) {
-    console.error(`Stack trace: ${error.stack}`);
-  }
-};
-
 export const delegateRouter = createTRPCRouter({
   addDelegateWeights: publicProcedure
     .input(
@@ -45,10 +38,9 @@ export const delegateRouter = createTRPCRouter({
           .limit(1)
           .execute();
 
-        let result;
         if (latestDelegation.length > 0) {
           // Update existing record
-          result = await ctx.db
+          await ctx.db
             .update(userDelegation)
             .set({ weights: weightsRecord })
             .where(
@@ -70,7 +62,6 @@ export const delegateRouter = createTRPCRouter({
           return { success: true, ud_nanoid };
         }
       } catch (error) {
-        logError("addDelegateWeights", error);
         if (error instanceof TRPCError) throw error;
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -92,7 +83,7 @@ export const delegateRouter = createTRPCRouter({
       try {
         // Insert new record
         const ud_nanoid = genId.userDelegation();
-        const result = await ctx.db
+        await ctx.db
           .insert(userDelegation)
           .values({
             ud_nanoid: ud_nanoid,
@@ -104,7 +95,6 @@ export const delegateRouter = createTRPCRouter({
 
         return { success: true, ud_nanoid, stake: input.stake.toString() };
       } catch (error) {
-        logError("addDelegateStake", error);
         if (error instanceof TRPCError) throw error;
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -141,7 +131,6 @@ export const delegateRouter = createTRPCRouter({
       }));
       return formattedData;
     } catch (error) {
-      logError("getAllDelegateWeightsAndStakes", error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to retrieve delegation weights and stakes",
@@ -170,7 +159,6 @@ export const delegateRouter = createTRPCRouter({
 
         return result[0]?.stake ?? null;
       } catch (error) {
-        logError("getDelegateStake", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to retrieve delegation stake",

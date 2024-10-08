@@ -78,7 +78,7 @@ export default function Delegators() {
                         <td className="border-b px-4 py-2">
                           ${((Number(item.stake!) / 1e9) * price).toFixed(2)}
                         </td>
-                        <td className="border-b px-4 py-2">
+                        <td className="border-b px-4 py-2 font-mono">
                           {truncateAddress(item.connected_account!)}
                         </td>
                         <td className="border-b px-4 py-2">
