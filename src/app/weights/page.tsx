@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { api } from "~/trpc/react";
 import { useWalletStore } from "~/providers/wallet-store-provider";
 
-const subnets = Array.from({ length: 48 }, (_, i) => `Subnet ${i + 1}`);
+const subnets = Array.from({ length: 52 }, (_, i) => `Subnet ${i + 1}`);
 
 type SubnetWeight = {
   subnet: string;
@@ -23,7 +23,6 @@ export default function WeightsPage() {
   const [query, setQuery] = useState("");
   const [weight, setWeight] = useState("");
   const [subnetWeights, setSubnetWeights] = useState<SubnetWeight[]>([]);
-
   const connectedAccount = useWalletStore((state) => state.connectedAccount);
 
   const filteredSubnets =

@@ -9,12 +9,12 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchPrice } from "~/utils/fetchPrice";
 
 export default function Delegators() {
+  const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [searchAddress, setSearchAddress] = useState<string>("");
   const { data: pythPrice } = useQuery({
     queryKey: ["fetch.pyth.price"],
     queryFn: fetchPrice,
   });
-  const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const { data, isLoading } =
     api.delegate.getAllDelegateWeightsAndStakes.useQuery();
 
