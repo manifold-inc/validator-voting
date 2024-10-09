@@ -15,12 +15,12 @@ however pull requests are always encouraged.
 
 Below are steps to create a Supabase connection string:
 
-1.) Either create an account or log in to Supabase
-2.) You might be asked to create an organization. In which case, choose the options best suited for your use case.
-3.) Once completed, create a new project with a secure password and location of your choosing. Save your password, you will need it later. Your project will then take a few minutes to be provisioned.
-4.) Once the project has been created, click on the green Connect button near the top right of the screen
-5.) A modal should open up. Click on connection string, URI, and change the mode from transaction to session in the dropdown
-6.) Copy the connection string shown and insert your password
+1. Either create an account or log in to Supabase
+1. You might be asked to create an organization. In which case, choose the options best suited for your use case.
+1. Once completed, create a new project with a secure password and location of your choosing. Save your password, you will need it later. Your project will then take a few minutes to be provisioned.
+1. Once the project has been created, click on the green Connect button near the top right of the screen
+1. A modal should open up. Click on connection string, URI, and change the mode from transaction to session in the dropdown
+1. Copy the connection string shown and insert your password
 
 ### 2. Copy `sample.env` to `.env`
 
