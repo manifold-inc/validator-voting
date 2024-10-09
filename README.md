@@ -24,8 +24,6 @@ Below are steps to create a Supabase connection string:
 
 ### 2. Copy `sample.env` to `.env`
 
-Example: `http://1.2.3.4:80`
-
 Fill in `DATABASE_URL` to your connection string you copied from Supabase.
 
 Fill in `NEXT_PUBLIC_VALIDATOR_NAME` with your name as a Validator.
