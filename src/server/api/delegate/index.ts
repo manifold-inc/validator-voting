@@ -2,7 +2,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { z } from "zod";
 import { userDelegation, genId } from "~/server/schema/schema";
 import { TRPCError } from "@trpc/server";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 
 export const delegateRouter = createTRPCRouter({
   addDelegateWeights: publicProcedure
@@ -166,4 +166,36 @@ export const delegateRouter = createTRPCRouter({
         });
       }
     }),
+  getSubnetWeights: publicProcedure.query(async ({ ctx }) => {
+    try {
+      const result = await ctx.db.execute(sql`
+          WITH latest_delegations AS (
+            SELECT DISTINCT ON (connected_account)
+              weights,
+              stake
+            FROM user_delegation
+            WHERE weights IS NOT NULL AND stake IS NOT NULL
+            ORDER BY connected_account, created_at DESC
+          )
+          SELECT 
+            key as subnet,
+            SUM(CAST(value AS FLOAT) * stake) / SUM(stake) as weight
+          FROM latest_delegations,
+            json_each_text(weights::json) as w(key, value)
+          GROUP BY key
+          ORDER BY weight DESC;
+        `);
+
+      return result.map((row) => ({
+        subnet: String(row.subnet),
+        weight: Number(row.weight),
+      }));
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to retrieve subnet weights",
+        cause: error,
+      });
+    }
+  }),
 });

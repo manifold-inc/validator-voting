@@ -119,29 +119,25 @@ export const removeStake = async (
       amount,
     );
 
-
     const txHash = await new Promise<string>((resolve, reject) => {
-        void customExtrinsic.signAndSend(
-          account,
-          { signer: injector.signer },
-          ({ status, dispatchError }) => {
-            if (status.isFinalized && !dispatchError) {
-              resolve(status.asFinalized.toString());
-            }
-            if (dispatchError) {
-              console.error(`Dispatch Error: ${dispatchError.toString()}`);
-              reject(
-                new Error(`Dispatch Error: ${dispatchError.toString()}`),
-              );
-            }
-          },
-        );
-      });
+      void customExtrinsic.signAndSend(
+        account,
+        { signer: injector.signer },
+        ({ status, dispatchError }) => {
+          if (status.isFinalized && !dispatchError) {
+            resolve(status.asFinalized.toString());
+          }
+          if (dispatchError) {
+            console.error(`Dispatch Error: ${dispatchError.toString()}`);
+            reject(new Error(`Dispatch Error: ${dispatchError.toString()}`));
+          }
+        },
+      );
+    });
 
-      return txHash;
-    } catch (e) {
-      console.error(`Error signing and sending tx: ${e as string}`);
-      return null;
-    }
-  
+    return txHash;
+  } catch (e) {
+    console.error(`Error signing and sending tx: ${e as string}`);
+    return null;
+  }
 };

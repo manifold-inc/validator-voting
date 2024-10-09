@@ -14,6 +14,7 @@ const WalletModal = dynamic(() => import("./walletModal"), { ssr: false });
 const navigation = [
   { name: "My Stake", href: "/staking" },
   { name: "Delegators", href: "/delegators" },
+  { name: "Subnet Weights", href: "/subnetweights" },
   { name: "My Weights", href: "/weights" },
 ];
 

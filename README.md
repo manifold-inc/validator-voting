@@ -3,8 +3,8 @@
 The goal of the validator voting is to give delegators a simple way to directly
 stake and remove stake to their validator. This also provides a Supabase database
 that tracks the delegators wallet and their allocation of weights across subnets so that
-the Validator can make a conscious decision on their weights based off of the delegators voice. 
-This is designed as a template for validators to take and create their own branded voting applications, 
+the Validator can make a conscious decision on their weights based off of the delegators voice.
+This is designed as a template for validators to take and create their own branded voting applications,
 however pull requests are always encouraged.
 
 ## Setup
@@ -39,6 +39,7 @@ Install [bun](https://bun.sh/), then run
 ```sh
 bun i
 ```
+
 to install the project dependencies, then
 
 ```sh
@@ -49,7 +50,7 @@ This initializes the database schema.
 
 ### 4. Test Application
 
-We highly recommend testing your application before deploying it. 
+We highly recommend testing your application before deploying it.
 
 Replace `NEXT_PUBLIC_VALIDATOR_ADDRESS` with a Testnet Validator address, then run
 
@@ -60,7 +61,9 @@ bun dev
 This builds your development application. Navigate to http://localhost:3000 and test your application with a Testnet wallet.
 
 #### Common Problem
+
 If you created a Polkadot/Talisman wallet and your application is not finding it through the modal, follow these steps:
+
 1. Open the Polkadot extension
 1. Click the settings button in the top right
 1. Click `Manage Website Access` in the bottom of the opened drawer
@@ -83,5 +86,6 @@ before advertising it.
 ## How to Contribute
 
 ### Code Review
+
 Manifold welcomes all PR's for the betterment of the subnet and Bittensor as a whole. We are striving for improvement at every interval and believe through open
-communication and sharing of ideas will success be attainable. We are happy to help with any questions in our Discord. 
+communication and sharing of ideas will success be attainable. We are happy to help with any questions in our Discord.
