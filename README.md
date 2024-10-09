@@ -1,29 +1,68 @@
-# Create T3 App
+# Validator Voting
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+The goal of the validator voting is to give delegators a simple way to directly
+stake and remove stake to their validator of choice. This also provides a Supabase database
+that tracks the delegators wallet and their allocation of weights across subnets so that
+the Validator can make a conscious decision on their weights based off of the delegators voice. 
+This is designed as a template for validators to take and create their own branded voting applications, 
+however pull requests are always encouraged.
 
-## What's next? How do I make an app with this?
+## Setup
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+### 1. Fork this repository to your own github account
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+### 2. Set up Supabase Database
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+Below are steps to create a Supabase connection string:
 
-## Learn More
+1.) Either create an account or log in to Supabase
+2.) You might be asked to create an organization. In which case, choose the options best suited for your use case.
+3.) Once completed, create a new project with a secure password and location of your choosing. Save your password, you will need it later. Your project will then take a few minutes to be provisioned.
+4.) Once the project has been created, click on the green Connect button near the top right of the screen
+5.) A modal should open up. Click on connection string, URI, and change the mode from transaction to session in the dropdown
+6.) Copy the connection string shown and insert your password
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+### 2. Copy `sample.env` to `.env`
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+Example: `http://1.2.3.4:80`
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+Fill in `DATABASE_URL` to your connection string you copied from Supabase.
 
-## How do I deploy this?
+Fill in `NEXT_PUBLIC_VALIDATOR_NAME` with your name as a Validator.
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+Fill in `NEXT_PUBLIC_VALIDATOR_ADDRESS` with your SS58 Address.
+
+Fill in `NEXT_PUBLIC_VALIDATOR_EXTENSION_ID` with the extension that you wish Polkadot to show to your users as the application asking for access.
+
+### 3. Setup Database / Bootstrap
+
+Install [bun](https://bun.sh/), then run
+
+```sh
+bun db:push
+```
+
+This initializes the database schema.
+
+### 4. Test Application
+
+We highly recommend testing your application before deploying it. 
+
+Replace `NEXT_PUBLIC_VALIDATOR_ADDRESS` with a Testnet Validator address.
+
+Run 
+```sh
+bun dev
+```
+
+This builds your development application. Navigate to http://localhost:3000 and test your application with a Testnet wallet.
+
+### 5. Create Vercel account and push project
+
+Create a [vercel](https://vercel.com/) account and hookup your github to it. Add
+a new project and import your forked github repo and paste in your .env file
+
+### Completion
+
+Your application should now be operational. Make sure you test everything yourself
+before advertising it.
