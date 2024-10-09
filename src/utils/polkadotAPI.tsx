@@ -119,39 +119,29 @@ export const removeStake = async (
       amount,
     );
 
-    let txHash: string | null = null;
-    let attempts = 0;
 
-    while (!txHash && attempts < 4) {
-      try {
-        txHash = await new Promise<string>((resolve, reject) => {
-          void customExtrinsic.signAndSend(
-            account,
-            { signer: injector.signer },
-            ({ status, dispatchError }) => {
-              if (status.isFinalized && !dispatchError) {
-                resolve(status.asFinalized.toString());
-              }
-              if (dispatchError) {
-                console.error(`Dispatch Error: ${dispatchError.toString()}`);
-                reject(
-                  new Error(`Dispatch Error: ${dispatchError.toString()}`),
-                );
-              }
-            },
-          );
-        });
-      } catch (e) {
-        console.error(`Error signing and sending tx: ${e as string}`);
-      }
-      if (!txHash) {
-        attempts++;
-      }
+    const txHash = await new Promise<string>((resolve, reject) => {
+        void customExtrinsic.signAndSend(
+          account,
+          { signer: injector.signer },
+          ({ status, dispatchError }) => {
+            if (status.isFinalized && !dispatchError) {
+              resolve(status.asFinalized.toString());
+            }
+            if (dispatchError) {
+              console.error(`Dispatch Error: ${dispatchError.toString()}`);
+              reject(
+                new Error(`Dispatch Error: ${dispatchError.toString()}`),
+              );
+            }
+          },
+        );
+      });
+
+      return txHash;
+    } catch (e) {
+      console.error(`Error signing and sending tx: ${e as string}`);
+      return null;
     }
-
-    return txHash;
-  } catch (e) {
-    console.error(`Error in removeStake: ${e as string}`);
-    return null;
-  }
+  
 };

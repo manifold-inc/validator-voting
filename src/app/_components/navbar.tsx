@@ -28,7 +28,7 @@ export default function Navbar() {
 
   const address = connectedAccount
     ? `${connectedAccount.substring(0, 5)}...${connectedAccount.substring(connectedAccount.length - 5)}`
-    : "Conect Wallet";
+    : "Connect Wallet";
 
   return (
     <header className="bg-white">
