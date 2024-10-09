@@ -6,6 +6,7 @@ that tracks the delegators wallet and their allocation of weights across subnets
 the Validator can make a conscious decision on their weights based off of the delegators voice. The weighted average of the 
 delegators weights in respect to their stake is also shown to the end user.
 
+
 This is designed as a template for validators to take and create their own branded voting applications,
 however pull requests are always encouraged.
 

@@ -27,7 +27,7 @@ export default function SubnetWeights() {
                         <tr>
                           <th className="w-36 border-b px-4 py-2">Subnet</th>
                           <th className="w-34 border-b px-4 py-2">
-                            Avg Weight
+                            Avg Weight w/ Stake
                           </th>
                         </tr>
                       </thead>
@@ -35,10 +35,10 @@ export default function SubnetWeights() {
                         {data?.map((item) => (
                           <tr key={item.subnet} className="hover:bg-gray-100">
                             <td className="border-b px-4 py-2">
-                              {item.subnet}
+                              {item.subnet.split(" ").pop()}
                             </td>
                             <td className="border-b px-4 py-2">
-                              {item.weight.toFixed(2)}%
+                              {item.weight.toFixed(2)} %
                             </td>
                           </tr>
                         ))}
