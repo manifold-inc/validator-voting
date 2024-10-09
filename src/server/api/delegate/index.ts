@@ -1,6 +1,6 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { z } from "zod";
-import { userDelegation, genId } from "~/server/schema/schema";
+import { userDelegation, genId, userWeights } from "~/server/schema/schema";
 import { TRPCError } from "@trpc/server";
 import { desc, eq, sql } from "drizzle-orm";
 
@@ -32,34 +32,33 @@ export const delegateRouter = createTRPCRouter({
         // Check if the connected account exists
         const latestDelegation = await ctx.db
           .select()
-          .from(userDelegation)
-          .where(eq(userDelegation.connected_account, input.connected_account))
-          .orderBy(desc(userDelegation.created_at))
+          .from(userWeights)
+          .where(eq(userWeights.connected_account, input.connected_account))
           .limit(1)
           .execute();
 
         if (latestDelegation.length > 0) {
           // Update existing record
           await ctx.db
-            .update(userDelegation)
+            .update(userWeights)
             .set({ weights: weightsRecord })
             .where(
-              eq(userDelegation.connected_account, input.connected_account),
+              eq(userWeights.connected_account, input.connected_account),
             )
             .execute();
-          return { success: true, ud_nanoid: latestDelegation[0]!.ud_nanoid };
+          return { success: true, };
         } else {
           // Insert new record
-          const ud_nanoid = genId.userDelegation();
+          const uw_nanoid = genId.userWeights();
           await ctx.db
-            .insert(userDelegation)
+            .insert(userWeights)
             .values({
-              ud_nanoid: ud_nanoid,
+              uw_nanoid: uw_nanoid,
               connected_account: input.connected_account,
               weights: weightsRecord,
             })
             .execute();
-          return { success: true, ud_nanoid };
+          return { success: true};
         }
       } catch (error) {
         if (error instanceof TRPCError) throw error;
@@ -71,50 +70,21 @@ export const delegateRouter = createTRPCRouter({
       }
     }),
 
-  addDelegateStake: publicProcedure
-    .input(
-      z.object({
-        connected_account: z.string(),
-        stake: z.bigint(),
-        txHash: z.string(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      try {
-        // Insert new record
-        const ud_nanoid = genId.userDelegation();
-        await ctx.db
-          .insert(userDelegation)
-          .values({
-            ud_nanoid: ud_nanoid,
-            connected_account: input.connected_account,
-            stake: input.stake,
-            txHash: input.txHash,
-          })
-          .execute();
-
-        return { success: true, ud_nanoid, stake: input.stake.toString() };
-      } catch (error) {
-        if (error instanceof TRPCError) throw error;
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to insert delegation stake",
-          cause: error,
-        });
-      }
-    }),
-
   getAllDelegateWeightsAndStakes: publicProcedure.query(async ({ ctx }) => {
     try {
       const result = await ctx.db
         .select({
           ud_nanoid: userDelegation.ud_nanoid,
           connected_account: userDelegation.connected_account,
-          weights: userDelegation.weights,
+          weights: userWeights.weights,
           stake: userDelegation.stake,
           timestamp: userDelegation.created_at,
         })
         .from(userDelegation)
+        .leftJoin(
+          userWeights,
+          eq(userDelegation.connected_account, userWeights.connected_account)
+        )
         .orderBy(desc(userDelegation.created_at))
         .execute();
 
@@ -181,6 +151,8 @@ export const delegateRouter = createTRPCRouter({
             key as subnet,
             SUM(CAST(value AS FLOAT) * stake) / SUM(stake) as weight
           FROM latest_delegations,
+
+
             json_each_text(weights::json) as w(key, value)
           GROUP BY key
           ORDER BY weight DESC;

@@ -40,16 +40,6 @@ export default function Staking() {
       { enabled: !!connectedAccount },
     );
 
-  const applyStakeMutation = api.delegate.addDelegateStake.useMutation({
-    onSuccess: () => {
-      setTaoAmount("");
-      void refetchStake();
-    },
-    onError: (error) => {
-      toast.error(`Error applying stake to DB: ${error.message}`);
-    },
-  });
-
   const handleDelegation = async () => {
     setIsDelegating(true);
 
@@ -68,11 +58,8 @@ export default function Staking() {
           toast.success(
             `Stake added successfully. Transaction hash: ${txHash}`,
           );
-          applyStakeMutation.mutate({
-            connected_account: connectedAccount!,
-            stake: taoAmountBigInt,
-            txHash: txHash,
-          });
+          setTaoAmount("")
+          void refetchStake()
           void taoBalance.refetch();
         } else {
           toast.error("Failed to add stake.");
@@ -104,11 +91,8 @@ export default function Staking() {
           toast.success(
             `Stake added successfully. Transaction hash: ${txHash}`,
           );
-          applyStakeMutation.mutate({
-            connected_account: connectedAccount!,
-            stake: stake! - taoAmountBigInt,
-            txHash: txHash,
-          });
+          setTaoAmount("")
+          void refetchStake()
           void taoBalance.refetch();
         } else {
           toast.error("Failed to undelegate stake.");
