@@ -1,7 +1,7 @@
 # Validator Voting
 
 The goal of the validator voting is to give delegators a simple way to directly
-stake and remove stake to their validator of choice. This also provides a Supabase database
+stake and remove stake to their validator. This also provides a Supabase database
 that tracks the delegators wallet and their allocation of weights across subnets so that
 the Validator can make a conscious decision on their weights based off of the delegators voice. 
 This is designed as a template for validators to take and create their own branded voting applications, 
@@ -19,12 +19,12 @@ Below are steps to create a Supabase connection string:
 1. You might be asked to create an organization. In which case, choose the options best suited for your use case.
 1. Once completed, create a new project with a secure password and location of your choosing. Save your password, you will need it later. Your project will then take a few minutes to be provisioned.
 1. Once the project has been created, click on the green Connect button near the top right of the screen
-1. A modal should open up. Click on connection string, URI, and change the mode from transaction to session in the dropdown
+1. A modal should open up. Click on connection string and URI.
 1. Copy the connection string shown and insert your password
 
 ### 2. Copy `sample.env` to `.env`
 
-Fill in `DATABASE_URL` to your connection string you copied from Supabase.
+Fill in `DATABASE_URL` to your connection string you copied from Supabase with your saved password.
 
 Fill in `NEXT_PUBLIC_VALIDATOR_NAME` with your name as a Validator.
 
@@ -64,3 +64,9 @@ a new project and import your forked github repo and paste in your .env file
 
 Your application should now be operational. Make sure you test everything yourself
 before advertising it.
+
+## How to Contribute
+
+### Code Review
+Manifold welcomes all PR's for the betterment of the subnet and Bittensor as a whole. We are striving for improvement at every interval and believe through open
+communication and sharing of ideas will success be attainable.
