@@ -66,7 +66,6 @@ export const weightsRouter = createTRPCRouter({
             weight: Number(weight),
           }),
         );
-        console.log(separatedWeights);
         return separatedWeights;
       } catch (error) {
         throw new TRPCError({

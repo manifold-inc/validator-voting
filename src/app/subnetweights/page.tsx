@@ -4,7 +4,7 @@ import { api } from "~/trpc/react";
 import { DonutChart } from "@tremor/react";
 
 export default function SubnetWeights() {
-  const { data, isLoading } = api.weights.getSubnetWeights.useQuery();
+  const { data } = api.weights.getSubnetWeights.useQuery();
 
   const dataFormatter = (number: number) => `${number.toFixed(2)}%`;
 
@@ -14,9 +14,7 @@ export default function SubnetWeights() {
         <div className="relative flex flex-col items-center justify-center gap-2 py-2 text-center sm:py-4 lg:px-6 lg:py-12">
           <p className="text-2xl font-semibold text-black">Subnet Weights</p>
 
-          {isLoading ? (
-            <p className="text-black">Loading...</p>
-          ) : (
+          {data ? (
             <div className="flex w-full flex-col pt-8 md:flex-row">
               {/* Table */}
               <div className="mb-8 w-full pr-4 md:mb-0 md:w-3/5">
@@ -68,6 +66,8 @@ export default function SubnetWeights() {
                 </div>
               </div>
             </div>
+          ) : (
+            <p> No data to show</p>
           )}
         </div>
       </div>
