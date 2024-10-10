@@ -3,9 +3,8 @@ import { useState } from "react";
 import { env } from "~/env.mjs";
 import { useWalletStore } from "~/providers/wallet-store-provider";
 import { toast } from "sonner";
-import { truncateAddress } from "~/utils/utils";
+import { truncateAddress, copyToClipboard } from "~/utils/utils";
 import { api } from "~/trpc/react";
-import { copyToClipboard } from "~/utils/utils";
 import { ClipboardIcon } from "@heroicons/react/24/outline";
 import { useQuery } from "@tanstack/react-query";
 import { fetchPrice } from "~/utils/fetchPrice";
@@ -40,16 +39,6 @@ export default function Staking() {
       { enabled: !!connectedAccount },
     );
 
-  const applyStakeMutation = api.delegate.addDelegateStake.useMutation({
-    onSuccess: () => {
-      setTaoAmount("");
-      void refetchStake();
-    },
-    onError: (error) => {
-      toast.error(`Error applying stake to DB: ${error.message}`);
-    },
-  });
-
   const handleDelegation = async () => {
     setIsDelegating(true);
 
@@ -68,11 +57,8 @@ export default function Staking() {
           toast.success(
             `Stake added successfully. Transaction hash: ${txHash}`,
           );
-          applyStakeMutation.mutate({
-            connected_account: connectedAccount!,
-            stake: taoAmountBigInt,
-            txHash: txHash,
-          });
+          setTaoAmount("");
+          void refetchStake();
           void taoBalance.refetch();
         } else {
           toast.error("Failed to add stake.");
@@ -104,11 +90,8 @@ export default function Staking() {
           toast.success(
             `Stake added successfully. Transaction hash: ${txHash}`,
           );
-          applyStakeMutation.mutate({
-            connected_account: connectedAccount!,
-            stake: stake! - taoAmountBigInt,
-            txHash: txHash,
-          });
+          setTaoAmount("");
+          void refetchStake();
           void taoBalance.refetch();
         } else {
           toast.error("Failed to undelegate stake.");
