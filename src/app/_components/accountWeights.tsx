@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
 
 type AccountWeightProps = {
-  accountWeights: Array<{ subnet: string; weight: number }>;
+  initialWeights: Array<{ subnet: string; weight: number }>;
   isLoading: boolean;
   connectedAccount: string;
   subnet: string;
@@ -13,7 +13,7 @@ type AccountWeightProps = {
 };
 
 export default function AccountWeights({
-  accountWeights,
+  initialWeights,
   isLoading,
   connectedAccount,
   subnet,
@@ -21,56 +21,39 @@ export default function AccountWeights({
   setSelectedSubnet,
   setWeight,
 }: AccountWeightProps) {
-  const [localWeights, setLocalWeights] = useState(accountWeights);
-  const [totalWeight, setTotalWeight] = useState(0);
+  const [weights, setWeights] = useState(initialWeights);
   const [hasChanges, setHasChanges] = useState(false);
 
-  useEffect(() => {
-    setLocalWeights(accountWeights);
-    calculateTotalWeight(accountWeights);
-    setHasChanges(false);
-  }, [accountWeights]);
-
-  const calculateTotalWeight = (
-    weights: Array<{ subnet: string; weight: number }>,
-  ) => {
-    const total = weights.reduce((sum, item) => sum + item.weight, 0);
-    setTotalWeight(total);
-  };
+  const totalWeight = useMemo(() => {
+    return weights.reduce((sum, item) => sum + item.weight, 0);
+  }, [weights]);
 
   const removeSubnetWeight = (subnetToRemove: string) => {
-    const updatedWeights = localWeights.filter(
+    const updatedWeights = weights.filter(
       (item) => item.subnet !== subnetToRemove,
     );
-    setLocalWeights(updatedWeights);
-    calculateTotalWeight(updatedWeights);
+    setWeights(updatedWeights);
     setHasChanges(true);
   };
 
   const adjustSubnetWeight = () => {
     if (subnet && weight && Number(weight) > 0) {
       const newWeight = Number(parseFloat(weight).toFixed(2));
-      const existingIndex = localWeights.findIndex(
-        (sw) => sw.subnet === subnet,
-      );
+      const existingIndex = weights.findIndex((sw) => sw.subnet === subnet);
 
       let updatedWeights;
       if (existingIndex !== -1) {
         // Update existing subnet weight
-        updatedWeights = localWeights.map((item, index) =>
+        updatedWeights = weights.map((item, index) =>
           index === existingIndex ? { ...item, weight: newWeight } : item,
         );
       } else {
         // Add new subnet weight
-        updatedWeights = [
-          ...localWeights,
-          { subnet: subnet, weight: newWeight },
-        ];
+        updatedWeights = [...weights, { subnet: subnet, weight: newWeight }];
       }
 
-      setLocalWeights(updatedWeights);
+      setWeights(updatedWeights);
       setHasChanges(true);
-      calculateTotalWeight(updatedWeights);
       setSelectedSubnet(null);
       setWeight("");
     }
@@ -79,6 +62,7 @@ export default function AccountWeights({
   const applyWeightsMutation = api.weights.addDelegateWeights.useMutation({
     onSuccess: () => {
       toast.success("Weights applied successfully");
+      setHasChanges(false);
     },
     onError: (error) => {
       toast.error(`Error applying weights: ${error.message}`);
@@ -105,7 +89,7 @@ export default function AccountWeights({
         )}
       </p>
       <ul className="max-h-32 overflow-y-auto">
-        {localWeights.map((item) => (
+        {weights.map((item) => (
           <li
             key={item.subnet}
             className="flex items-center justify-between pb-2"
@@ -144,7 +128,7 @@ export default function AccountWeights({
             if (connectedAccount) {
               applyWeightsMutation.mutate({
                 connected_account: connectedAccount,
-                weights: localWeights.map(({ subnet, weight }) => ({
+                weights: weights.map(({ subnet, weight }) => ({
                   subnet,
                   weight,
                 })),
