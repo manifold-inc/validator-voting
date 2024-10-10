@@ -34,91 +34,88 @@ Fill in `NEXT_PUBLIC_VALIDATOR_ADDRESS` with your SS58 Address.
 
 Fill in `NEXT_PUBLIC_VALIDATOR_EXTENSION_ID` with the extension that you wish Polkadot to show to your users as the application asking for access.
 
+### 3. Setup and Run the Application
 
-### 3. Setup Database / Bootstrap
+This project uses a Justfile to simplify setup and execution. Follow these steps:
 
-Install [bun](https://bun.sh/), then run
+1. Install [just](https://github.com/casey/just#installation) if you haven't already.
 
-```sh
-bun i
-```
+2. Install [bun](https://bun.sh/) if you haven't already.
 
-to install the project dependencies, then
-
-```sh
-bun db:push
-```
-
-This initializes the database schema.
-
-### 4. Setup Cron Job
-
-This application supports an on chain check for delegations. Underneath the `/scripts` subfolder, you will see an onChain.py which queries
-the Supabase database for the delegators hotkeys and checks on chain for their stake amount in Rao. It then updates their record in the 
-database with that amount. This has been setup to run once per interval or every 72 minutes. To set up, please follow the below instructions.
-
-1. Copy `/scripts/.env.example` to `/scripts/.env`
-1. Go to your project in Supabase.
-1. Click on the green Connect button near the top right of the screen
-1. A modal will open up, select on Python for the navbar in the middle
-1. Copy the connections including user, host, port, dbname
-1. Fill these in, including your password which you should have saved earlier
-1. We have provided the finney and test endpoints for you so no need to change those depending on your use case
-
-Within the bash file, we have constructed the methodology to install the requirements, create the virtual environment and activate, and then 
-create the executable and run it for every interval.
-
-To run it:
-
-1. Navigate to the scripts directory:
+3. In the project root directory, run the following command to install dependencies and set up the database:
 
    ```sh
-   cd scripts
+   just setup
    ```
 
-2. Make the bash script executable:
+   This will install the project dependencies and initialize the database schema.
 
-   ```sh
-   chmod +x setup_cron.sh
-   ```
+### 4. Running the Application
 
-3. Run the setup script:
-
-   ```sh
-   ./setup_cron.sh
-   ```
-
-NOTE: If you do not run this bash script, your database will not update with the "true" staked value on chain.
-
-### 5. Test Application
-
-We highly recommend testing your application before deploying it.
-
-Replace `NEXT_PUBLIC_VALIDATOR_ADDRESS` with a Testnet Validator address, then run
+To start the development server:
 
 ```sh
-bun dev
+just dev
 ```
 
-This builds your development application. Navigate to http://localhost:3000 and test your application with a Testnet wallet.
+To build the application for production:
 
-#### Common Problem
+```sh
+just build
+```
 
-If you created a Polkadot/Talisman wallet and your application is not finding it through the modal, follow these steps:
+### 5. Docker Setup for Stake Updater
 
-1. Open the Polkadot extension
-1. Click the settings button in the top right
-1. Click `Manage Website Access` in the bottom of the opened drawer
-1. Click on the `No Accounts` button for the application that is yours. Should be `NEXT_PUBLIC_VALIDATOR_EXTENSION_ID` or your domain
-1. Select your account and hit `connect`
-1. Check the modal and you should see your account now
+The application includes a stake updater that runs in a Docker container. To set it up:
 
-Happy Delegating :)
+1. Copy `/stake_updater/.env.example` to `/stake_updater/.env`
+2. Fill in the `.env` file with your Supabase connection details (available in your Supabase project settings)
 
-### 5. Create Vercel account and push project
+3. To build and start the Docker container:
+
+   ```sh
+   just docker-start
+   ```
+
+   This will build the Docker image and run the container in detached mode.
+
+4. To stop and remove the Docker container:
+
+   ```sh
+   just docker-stop
+   ```
+
+### 6. Full Setup and Start
+
+To perform a full setup, including starting the development server and the Docker container:
+
+```sh
+just start-all
+```
+
+This command will set up the project, start the Docker container, and run the development server.
+
+### 7. Stopping All Services
+
+To stop all services and clean up:
+
+```sh
+just stop-all
+```
+
+This will stop and remove the Docker container.
+
+Note: The stake updater in the Docker container updates the database with the "true" staked value on chain every 72 minutes. If you don't run this container, your database won't have up-to-date stake information.
+
+### 8. Create Vercel account and push project
 
 Create a [vercel](https://vercel.com/) account and hookup your github to it. Add
 a new project and import your forked github repo and paste in your .env file
+
+For production:
+
+1. Remember to change from your test validator address to your finney validator address
+1. Change `subtensor = SubtensorInterface(os.getenv("__finney_test_entrypoint__"))` to `subtensor = SubtensorInterface(os.getenv("__finney_entrypoint__"))`
 
 ### Completion
 

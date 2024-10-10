@@ -66,9 +66,6 @@ async def update_stake_amounts(connection):
     print(f"Using validator hotkey: {validator_hotkey}")
 
     for delegation in delegations:
-        if len(delegation) != 2:
-            print(f"Skipping invalid delegation record: {delegation}")
-            continue
 
         delegation_id, staker_ss58_address = delegation
         print(
