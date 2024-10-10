@@ -4,7 +4,7 @@ import { api } from "~/trpc/react";
 import { DonutChart } from "@tremor/react";
 
 export default function SubnetWeights() {
-  const { data, isLoading } = api.delegate.getSubnetWeights.useQuery();
+  const { data, isLoading } = api.weights.getSubnetWeights.useQuery();
 
   const dataFormatter = (number: number) => `${number.toFixed(2)}%`;
 

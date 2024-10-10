@@ -17,6 +17,6 @@ export const userDelegation = pgTable("user_delegation", {
 
 export const userWeights = pgTable("user_weights", {
   uw_nanoid: varchar("uw_nanoid", { length: 30 }).primaryKey(),
-  connected_account: varchar("connected_account", {length: 256}),
+  connected_account: varchar("connected_account", { length: 256 }),
   weights: json("weights").$type<Record<string, number>>(),
-})
+});

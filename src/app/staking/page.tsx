@@ -57,8 +57,8 @@ export default function Staking() {
           toast.success(
             `Stake added successfully. Transaction hash: ${txHash}`,
           );
-          setTaoAmount("")
-          void refetchStake()
+          setTaoAmount("");
+          void refetchStake();
           void taoBalance.refetch();
         } else {
           toast.error("Failed to add stake.");
@@ -90,8 +90,8 @@ export default function Staking() {
           toast.success(
             `Stake added successfully. Transaction hash: ${txHash}`,
           );
-          setTaoAmount("")
-          void refetchStake()
+          setTaoAmount("");
+          void refetchStake();
           void taoBalance.refetch();
         } else {
           toast.error("Failed to undelegate stake.");

@@ -3,9 +3,8 @@
 The goal of the validator voting is to give delegators a simple way to directly
 stake and remove stake to their validator. This also provides a Supabase database
 that tracks the delegators wallet and their allocation of weights across subnets so that
-the Validator can make a conscious decision on their weights based off of the delegators voice. The weighted average of the 
+the Validator can make a conscious decision on their weights based off of the delegators voice. The weighted average of the
 delegators weights in respect to their stake is also shown to the end user.
-
 
 This is designed as a template for validators to take and create their own branded voting applications,
 however pull requests are always encouraged.

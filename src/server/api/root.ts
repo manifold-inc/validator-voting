@@ -1,5 +1,6 @@
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { delegateRouter } from "./delegate";
+import { weightsRouter } from "./weights";
 
 /**
  * This is the primary router for your server.
@@ -8,6 +9,7 @@ import { delegateRouter } from "./delegate";
  */
 export const appRouter = createTRPCRouter({
   delegate: delegateRouter,
+  weights: weightsRouter,
 });
 
 // export type definition of API

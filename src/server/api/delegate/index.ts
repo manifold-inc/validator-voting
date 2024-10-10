@@ -1,75 +1,10 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { z } from "zod";
-import { userDelegation, genId, userWeights } from "~/server/schema/schema";
+import { userDelegation, userWeights } from "~/server/schema/schema";
 import { TRPCError } from "@trpc/server";
 import { desc, eq, sql } from "drizzle-orm";
 
 export const delegateRouter = createTRPCRouter({
-  addDelegateWeights: publicProcedure
-    .input(
-      z.object({
-        connected_account: z.string(),
-        weights: z.array(z.object({ subnet: z.string(), weight: z.number() })),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      try {
-        const totalWeight = input.weights.reduce(
-          (sum, weight) => sum + weight.weight,
-          0,
-        );
-        if (totalWeight !== 100) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Total weight must be 100",
-          });
-        }
-
-        const weightsRecord = Object.fromEntries(
-          input.weights.map(({ subnet, weight }) => [subnet, weight]),
-        );
-
-        // Check if the connected account exists
-        const latestDelegation = await ctx.db
-          .select()
-          .from(userWeights)
-          .where(eq(userWeights.connected_account, input.connected_account))
-          .limit(1)
-          .execute();
-
-        if (latestDelegation.length > 0) {
-          // Update existing record
-          await ctx.db
-            .update(userWeights)
-            .set({ weights: weightsRecord })
-            .where(
-              eq(userWeights.connected_account, input.connected_account),
-            )
-            .execute();
-          return { success: true, };
-        } else {
-          // Insert new record
-          const uw_nanoid = genId.userWeights();
-          await ctx.db
-            .insert(userWeights)
-            .values({
-              uw_nanoid: uw_nanoid,
-              connected_account: input.connected_account,
-              weights: weightsRecord,
-            })
-            .execute();
-          return { success: true};
-        }
-      } catch (error) {
-        if (error instanceof TRPCError) throw error;
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to update or insert delegation weights",
-          cause: error,
-        });
-      }
-    }),
-
   getAllDelegateWeightsAndStakes: publicProcedure.query(async ({ ctx }) => {
     try {
       const result = await ctx.db
@@ -83,7 +18,7 @@ export const delegateRouter = createTRPCRouter({
         .from(userDelegation)
         .leftJoin(
           userWeights,
-          eq(userDelegation.connected_account, userWeights.connected_account)
+          eq(userDelegation.connected_account, userWeights.connected_account),
         )
         .orderBy(desc(userDelegation.created_at))
         .execute();

@@ -25,6 +25,21 @@ export default function WeightsPage() {
   const [subnetWeights, setSubnetWeights] = useState<SubnetWeight[]>([]);
   const connectedAccount = useWalletStore((state) => state.connectedAccount);
 
+  const { data: accountWeights, isLoading } =
+    api.weights.getDelegateSubnetWeights.useQuery(
+      {
+        connected_account: connectedAccount ?? "",
+      },
+      {
+        enabled: !!connectedAccount,
+      },
+    );
+  useEffect(() => {
+    if (accountWeights) {
+      setSubnetWeights(accountWeights);
+    }
+  }, [accountWeights]);
+
   const filteredSubnets =
     query === ""
       ? subnets
@@ -76,7 +91,7 @@ export default function WeightsPage() {
     }
   }, [totalWeight]);
 
-  const applyWeightsMutation = api.delegate.addDelegateWeights.useMutation({
+  const applyWeightsMutation = api.weights.addDelegateWeights.useMutation({
     onSuccess: () => {
       toast.success("Weights applied successfully");
     },
@@ -235,17 +250,36 @@ export default function WeightsPage() {
                     }
                     className="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 enabled:hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                   >
-                    Add Weight to Subnet
+                    {accountWeights
+                      ? "Adjust Weights to Subnet"
+                      : "Add Weight to Subnet"}
                   </button>
                   <p className="text-sm text-gray-700">
                     Remaining: {100 - totalWeight}%
                   </p>
                 </div>
-
                 {subnetWeights.length > 0 && (
                   <>
-                    <p className="pt-4 text-center text-lg font-medium leading-6 text-white sm:text-left">
-                      Added Subnet Weights
+                    <p className="pt-4 text-center text-lg font-medium leading-6 text-black sm:text-left">
+                      {connectedAccount && accountWeights ? (
+                        isLoading ? (
+                          <>
+                            Loading weights for{" "}
+                            <span className="font-mono">
+                              {`${connectedAccount.slice(0, 5)}...${connectedAccount.slice(-5)}`}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            Subnet Weights for{" "}
+                            <span className="font-mono">
+                              {`${connectedAccount.slice(0, 5)}...${connectedAccount.slice(-5)}`}
+                            </span>
+                          </>
+                        )
+                      ) : (
+                        "Added Subnet Weights"
+                      )}
                     </p>
                     <ul className="max-h-32 overflow-y-auto">
                       {subnetWeights.map((item) => (
