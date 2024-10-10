@@ -24,7 +24,7 @@ Below are steps to create a Supabase connection string:
 1. A modal should open up. Click on connection string and URI.
 1. Copy the connection string shown and insert your password
 
-### 2. Copy `sample.env` to `.env`
+### 2. Copy `.env.exmaple` to `.env`
 
 Fill in `DATABASE_URL` to your connection string you copied from Supabase with your saved password.
 
@@ -33,6 +33,7 @@ Fill in `NEXT_PUBLIC_VALIDATOR_NAME` with your name as a Validator.
 Fill in `NEXT_PUBLIC_VALIDATOR_ADDRESS` with your SS58 Address.
 
 Fill in `NEXT_PUBLIC_VALIDATOR_EXTENSION_ID` with the extension that you wish Polkadot to show to your users as the application asking for access.
+
 
 ### 3. Setup Database / Bootstrap
 
@@ -50,7 +51,46 @@ bun db:push
 
 This initializes the database schema.
 
-### 4. Test Application
+### 4. Setup Cron Job
+
+This application supports an on chain check for delegations. Underneath the `/scripts` subfolder, you will see an onChain.py which queries
+the Supabase database for the delegators hotkeys and checks on chain for their stake amount in Rao. It then updates their record in the 
+database with that amount. This has been setup to run once per interval or every 72 minutes. To set up, please follow the below instructions.
+
+1. Copy `/scripts/.env.example` to `/scripts/.env`
+1. Go to your project in Supabase.
+1. Click on the green Connect button near the top right of the screen
+1. A modal will open up, select on Python for the navbar in the middle
+1. Copy the connections including user, host, port, dbname
+1. Fill these in, including your password which you should have saved earlier
+1. We have provided the finney and test endpoints for you so no need to change those depending on your use case
+
+Within the bash file, we have constructed the methodology to install the requirements, create the virtual environment and activate, and then 
+create the executable and run it for every interval.
+
+To run it:
+
+1. Navigate to the scripts directory:
+
+   ```sh
+   cd scripts
+   ```
+
+2. Make the bash script executable:
+
+   ```sh
+   chmod +x setup_cron.sh
+   ```
+
+3. Run the setup script:
+
+   ```sh
+   ./setup_cron.sh
+   ```
+
+NOTE: If you do not run this bash script, your database will not update with the "true" staked value on chain.
+
+### 5. Test Application
 
 We highly recommend testing your application before deploying it.
 
