@@ -8,23 +8,22 @@ export const weightsRouter = createTRPCRouter({
   getSubnetWeights: publicProcedure.query(async ({ ctx }) => {
     try {
       const result = await ctx.db.execute(sql`
-              WITH latest_delegations AS (
-                SELECT DISTINCT ON (connected_account)
-                  weights,
-                  stake
-                FROM user_delegation
-                WHERE weights IS NOT NULL AND stake IS NOT NULL
-                ORDER BY connected_account, created_at DESC
-              )
-              SELECT 
-                key as subnet,
-                SUM(CAST(value AS FLOAT) * stake) / SUM(stake) as weight
-              FROM latest_delegations,
-    
-    
-                json_each_text(weights::json) as w(key, value)
-              GROUP BY key
-              ORDER BY weight DESC;
+        WITH latest_delegations AS (
+          SELECT DISTINCT ON (ud.connected_account)
+            uw.weights,
+            ud.stake
+          FROM user_delegation ud
+          JOIN user_weights uw ON ud.connected_account = uw.connected_account
+          WHERE uw.weights IS NOT NULL AND ud.stake IS NOT NULL
+          ORDER BY ud.connected_account, ud.created_at DESC
+        )
+        SELECT 
+          key as subnet,
+          SUM(CAST(value AS FLOAT) * stake) / SUM(stake) as weight
+        FROM latest_delegations,
+          json_each_text(weights::json) as w(key, value)
+        GROUP BY key
+        ORDER BY weight DESC;
             `);
 
       return result.map((row) => ({
