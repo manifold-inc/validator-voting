@@ -53,7 +53,7 @@ export const weightsRouter = createTRPCRouter({
         .from(userDelegation)
         .leftJoin(
           userWeights,
-          eq(userDelegation.connected_account, userWeights.connected_account)
+          eq(userDelegation.connected_account, userWeights.connected_account),
         )
         .where(isNull(userWeights.uw_nanoid));
 

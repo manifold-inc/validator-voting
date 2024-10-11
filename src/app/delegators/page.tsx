@@ -73,7 +73,7 @@ export default function Delegators() {
                         className="cursor-pointer hover:bg-gray-100"
                       >
                         <td className="border-b px-4 py-2">
-                          {Number(item.stake!) / 1e9} τ 
+                          {Number(item.stake!) / 1e9} τ
                         </td>
                         <td className="border-b px-4 py-2">
                           ${((Number(item.stake!) / 1e9) * price).toFixed(2)}

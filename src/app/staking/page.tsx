@@ -208,7 +208,7 @@ export default function Staking() {
                     >
                       Tao Amount:
                     </label>
-                    <div className="mt-2 flex items-center sm:col-span-2 sm:mt-0 gap-2">
+                    <div className="mt-2 flex items-center gap-2 sm:col-span-2 sm:mt-0">
                       <input
                         id="taoAmount"
                         name="Tao Amount"
@@ -223,7 +223,7 @@ export default function Staking() {
                         }}
                         className="flex rounded border border-gray-200 bg-transparent py-1.5 pl-1 text-black placeholder:text-gray-800 focus:ring-0 sm:text-sm sm:leading-6"
                       />
-                      τ 
+                      τ
                     </div>
                   </div>
                   <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">

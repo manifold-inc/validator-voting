@@ -48,7 +48,10 @@ export default function SubnetWeights() {
                 </div>
                 {totalFreeStake && (
                   <div className="p-4 text-center">
-                    <p className="italic font-semibold" > Stake with No Votes: {Number(totalFreeStake) / 1e9} τ </p>
+                    <p className="font-semibold italic">
+                      {" "}
+                      Stake with No Votes: {Number(totalFreeStake) / 1e9} τ{" "}
+                    </p>
                   </div>
                 )}
               </div>
