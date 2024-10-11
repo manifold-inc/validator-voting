@@ -84,7 +84,7 @@ Builds the application for production using Bun.
 just docker-start
 ```
 
-Builds and runs the Docker container for the stake updater. This container updates the database with the current staked values from the blockchain every 72 minutes.
+Builds and runs the Docker container for the stake updater. This container updates the database with the current staked values from the blockchain every minute.
 
 ### Stop Docker Container
 
