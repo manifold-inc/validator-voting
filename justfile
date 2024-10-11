@@ -29,6 +29,5 @@ down:
 up: docker-start dev
 
 # Full setup and start: setup, build Docker, run dev server and Docker container
-start-all: setup docker-start
-    bun dev
+start-all: setup docker-start dev
 
