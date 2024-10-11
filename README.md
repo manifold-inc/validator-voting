@@ -159,7 +159,7 @@ The application includes a stake updater that runs in a Docker container. To set
 1. Copy `/stake_updater/.env.example` to `/stake_updater/.env`
 2. Fill in the `.env` file with your Supabase connection details (available in your Supabase project settings)
 
-Note: The stake updater in the Docker container updates the database with the "true" staked value on chain every 72 minutes. If you don't run this container, your database won't have up-to-date stake information.
+Note: The stake updater in the Docker container updates the database with the "true" staked value on chain every minute. If you don't run this container, your database won't have up-to-date stake information.
 
 ## Weights Calculation Script
 
@@ -186,7 +186,7 @@ This project includes a Python script for calculating weighted averages of subne
    DB_PASSWORD=your_database_password
    ```
 
-   Replace the placeholders with your actual Supabase database credentials, this should be the same as your `stake_updater/env` sans the
+   Replace the placeholders with your actual Supabase database credentials, this should be the same as your `stake_updater/.env` sans the
    finney and test entry points
 
 ### Running the Weights Calculation Script
@@ -239,9 +239,7 @@ If you encounter issues with the Docker build process, ensure that:
 
 If problems persist, check the Docker build logs for more detailed error messages.
 
-If you encounter issues with the Polkadot extension
-
-, ensure that the application has access to view your Polkadot wallet:
+If you encounter issues with the Polkadot extension, ensure that the application has access to view your Polkadot wallet:
 
 1. Open the Polkadot extension
 1. Click the settings button in the top right
