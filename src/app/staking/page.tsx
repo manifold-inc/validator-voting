@@ -174,7 +174,7 @@ export default function Staking() {
                     <div className="mt-2 flex items-center justify-between text-gray-800 sm:col-span-2 sm:mt-0">
                       <span className="group relative">
                         {stake
-                          ? `${(Number(stake) / 1e9).toFixed(4)} Tao || $${((Number(stake) / 1e9) * price).toFixed(2)}`
+                          ? `${(Number(stake) / 1e9).toFixed(4)} τ  || $${((Number(stake) / 1e9) * price).toFixed(2)}`
                           : "No staked balance"}
                         <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-gray-400 px-2 py-1 text-xs text-black group-hover:block">
                           This is the staked balance in the database for this
@@ -195,7 +195,7 @@ export default function Staking() {
                     <div className="mt-2 flex items-center justify-between text-gray-800 sm:col-span-2 sm:mt-0">
                       <span>
                         {taoBalance.data
-                          ? `${(Number(taoBalance.data) / 1e9).toFixed(4)} Tao || $${((Number(taoBalance.data) / 1e9) * price).toFixed(2)}`
+                          ? `${(Number(taoBalance.data) / 1e9).toFixed(4)} τ  || $${((Number(taoBalance.data) / 1e9) * price).toFixed(2)}`
                           : "No available balance"}
                       </span>
                     </div>
@@ -208,7 +208,7 @@ export default function Staking() {
                     >
                       Tao Amount:
                     </label>
-                    <div className="mt-2 flex items-center sm:col-span-2 sm:mt-0">
+                    <div className="mt-2 flex items-center sm:col-span-2 sm:mt-0 gap-2">
                       <input
                         id="taoAmount"
                         name="Tao Amount"
@@ -223,6 +223,7 @@ export default function Staking() {
                         }}
                         className="flex rounded border border-gray-200 bg-transparent py-1.5 pl-1 text-black placeholder:text-gray-800 focus:ring-0 sm:text-sm sm:leading-6"
                       />
+                      τ 
                     </div>
                   </div>
                   <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">

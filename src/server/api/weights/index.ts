@@ -1,8 +1,8 @@
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, isNull } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { genId, userWeights } from "~/server/schema/schema";
+import { genId, userDelegation, userWeights } from "~/server/schema/schema";
 
 export const weightsRouter = createTRPCRouter({
   getSubnetWeights: publicProcedure.query(async ({ ctx }) => {
@@ -36,6 +36,25 @@ export const weightsRouter = createTRPCRouter({
         message: "Failed to retrieve subnet weights",
         cause: error,
       });
+    }
+  }),
+  getStakeNoWeights: publicProcedure.query(async ({ ctx }) => {
+    try {
+      const result = await ctx.db
+        .select({
+          totalStake: sql<bigint>`sum(${userDelegation.stake})`,
+        })
+        .from(userDelegation)
+        .leftJoin(
+          userWeights,
+          eq(userDelegation.connected_account, userWeights.connected_account)
+        )
+        .where(isNull(userWeights.uw_nanoid));
+
+      return result[0]?.totalStake ?? 0n;
+    } catch (error) {
+      console.error("Error fetching stake with no weights:", error);
+      throw new Error("Failed to fetch stake with no weights");
     }
   }),
   getDelegateSubnetWeights: publicProcedure

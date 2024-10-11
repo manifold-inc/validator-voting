@@ -6,6 +6,9 @@ import { DonutChart } from "@tremor/react";
 export default function SubnetWeights() {
   const { data } = api.weights.getSubnetWeights.useQuery();
 
+  const { data: totalFreeStake } = api.weights.getStakeNoWeights.useQuery();
+  console.log(totalFreeStake)
+
   const dataFormatter = (number: number) => `${number.toFixed(2)}%`;
 
   return (
@@ -44,6 +47,11 @@ export default function SubnetWeights() {
                     </table>
                   </div>
                 </div>
+                {totalFreeStake && (
+                  <div className="p-4 text-center">
+                    <p className="italic font-semibold" > Stake with No Votes: {Number(totalFreeStake) / 1e9} τ </p>
+                  </div>
+                )}
               </div>
 
               {/* Donut Chart */}
