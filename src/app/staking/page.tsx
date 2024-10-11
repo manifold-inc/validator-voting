@@ -177,9 +177,7 @@ export default function Staking() {
                           ? `${(Number(stake) / 1e9).toFixed(4)} τ  || $${((Number(stake) / 1e9) * price).toFixed(2)}`
                           : "No staked balance"}
                         <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-gray-400 px-2 py-1 text-xs text-black group-hover:block">
-                          This is the staked balance in the database for this
-                          validator. It may not reflect the actual staked
-                          balance on the chain.
+                          This value is calculated on chain, will update every 1 minute or so.
                         </span>
                       </span>
                     </div>
