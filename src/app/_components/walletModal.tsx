@@ -14,6 +14,7 @@ import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 import Link from "next/link";
 import { type InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { useWalletStore } from "~/providers/wallet-store-provider";
+import { env } from "~/env.mjs";
 
 interface WalletModalProps {
   isOpen: boolean;
@@ -40,7 +41,7 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
     try {
       // Enable web3
       const extensions = await web3Enable(
-        process.env.POLKADOT_EXTENSION_ID ?? "Tao Validator Voting",
+        env.NEXT_PUBLIC_POLKADOT_EXTENSION_ID ?? "Tao Validator Voting",
       );
       if (extensions.length === 0) {
         throw new Error(

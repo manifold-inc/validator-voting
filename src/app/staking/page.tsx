@@ -234,7 +234,7 @@ export default function Staking() {
                     </label>
                     <div className="mt-2 flex items-center gap-2 sm:col-span-2 sm:mt-0">
                       <code className="break-all rounded bg-gray-300 p-2 text-xs text-black">
-                        btcli roots delegate --delegate_ss58key{" "}
+                        btcli root delegate --delegate_ss58key{" "}
                         {truncateAddress(env.NEXT_PUBLIC_VALIDATOR_ADDRESS)}
                       </code>
                       <button
