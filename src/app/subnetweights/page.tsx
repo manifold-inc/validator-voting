@@ -7,7 +7,6 @@ export default function SubnetWeights() {
   const { data } = api.weights.getSubnetWeights.useQuery();
 
   const { data: totalFreeStake } = api.weights.getStakeNoWeights.useQuery();
-  console.log(totalFreeStake)
 
   const dataFormatter = (number: number) => `${number.toFixed(2)}%`;
 

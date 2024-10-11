@@ -46,4 +46,4 @@ yarn-error.log*
 .idea
 
 # Python virtual environment
-/scripts/venv/
+/weights_calc/venv/

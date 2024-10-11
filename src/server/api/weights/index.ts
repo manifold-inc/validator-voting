@@ -16,12 +16,18 @@ export const weightsRouter = createTRPCRouter({
           JOIN user_weights uw ON ud.connected_account = uw.connected_account
           WHERE uw.weights IS NOT NULL AND ud.stake IS NOT NULL
           ORDER BY ud.connected_account, ud.created_at DESC
+        ),
+        total_stakes AS (
+          SELECT SUM(stake) as total_stake FROM latest_delegations
         )
         SELECT 
           key as subnet,
-          SUM(CAST(value AS FLOAT) * stake) / SUM(stake) as weight
+          SUM(CAST(value AS FLOAT) / 100 * stake) as weighted_sum,
+          (SELECT total_stake FROM total_stakes) as total_stake,
+          (SUM(CAST(value AS FLOAT) / 100 * stake) / (SELECT total_stake FROM total_stakes)) * 100 as weight,
+          COUNT(*) as count
         FROM latest_delegations,
-          json_each_text(weights::json) as w(key, value)
+          jsonb_each_text(weights::jsonb) as w(key, value)
         GROUP BY key
         ORDER BY weight DESC;
             `);
