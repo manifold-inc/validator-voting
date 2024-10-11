@@ -258,7 +258,7 @@ export default function Staking() {
                         className="ml-2 cursor-pointer"
                         onClick={() =>
                           handleCopyClipboard(
-                            `btcli roots delegate --delegate_ss58key ${env.NEXT_PUBLIC_VALIDATOR_ADDRESS}`,
+                            `btcli root delegate --delegate_ss58key ${env.NEXT_PUBLIC_VALIDATOR_ADDRESS}`,
                           )
                         }
                       >
