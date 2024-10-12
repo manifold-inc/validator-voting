@@ -4,7 +4,6 @@ import { toast } from "sonner";
 
 type AccountWeightProps = {
   initialWeights: Array<{ subnet: string; weight: number }>;
-  isLoading: boolean;
   connectedAccount: string;
   subnet: string;
   weight: string;
@@ -14,7 +13,6 @@ type AccountWeightProps = {
 
 export default function AccountWeights({
   initialWeights,
-  isLoading,
   connectedAccount,
   subnet,
   weight,
@@ -71,42 +69,7 @@ export default function AccountWeights({
 
   return (
     <>
-      <p className="pt-4 text-center text-lg font-medium leading-6 text-black sm:text-left">
-        {isLoading ? (
-          <>
-            Loading weights for{" "}
-            <span className="font-mono">
-              {`${connectedAccount?.slice(0, 5)}...${connectedAccount?.slice(-5)}`}
-            </span>
-          </>
-        ) : (
-          <>
-            Subnet Weights for{" "}
-            <span className="font-mono">
-              {`${connectedAccount?.slice(0, 5)}...${connectedAccount?.slice(-5)}`}
-            </span>
-          </>
-        )}
-      </p>
-      <ul className="max-h-32 overflow-y-auto">
-        {weights.map((item) => (
-          <li
-            key={item.subnet}
-            className="flex items-center justify-between pb-2"
-          >
-            <span className="text-sm text-gray-700">
-              {item.weight}% {item.subnet}
-            </span>
-            <button
-              onClick={() => removeSubnetWeight(item.subnet)}
-              className="text-sm text-red-400 hover:text-red-500"
-            >
-              Remove
-            </button>
-          </li>
-        ))}
-      </ul>
-      <div className="flex flex-col items-center justify-between space-y-4 sm:flex-row sm:space-y-0">
+      <div className="flex flex-col items-center justify-between space-y-4 py-5 sm:flex-row sm:space-y-0">
         <button
           type="button"
           onClick={adjustSubnetWeight}
@@ -117,13 +80,32 @@ export default function AccountWeights({
         >
           Adjust Weight for Subnet
         </button>
-        <p className="text-sm text-gray-700">Remaining: {100 - totalWeight}%</p>
+        <p className="text-sm text-gray-600">{100 - totalWeight}% Remaining</p>
       </div>
-      <div>
+      <ul className="max-h-32 overflow-y-auto">
+        {weights.map((item) => (
+          <li
+            key={item.subnet}
+            className="flex items-center justify-between pb-2"
+          >
+            <span className="text-sm text-gray-700">
+              <span className="font-mono">{item.weight}% </span>
+              {item.subnet}
+            </span>
+            <button
+              onClick={() => removeSubnetWeight(item.subnet)}
+              className="text-sm text-red-400 hover:text-red-500"
+            >
+              Remove
+            </button>
+          </li>
+        ))}
+      </ul>
+      <div className="pt-5">
         <button
           type="button"
           disabled={!hasChanges || totalWeight !== 100 || !connectedAccount}
-          className="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 enabled:hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
           onClick={() => {
             if (connectedAccount) {
               applyWeightsMutation.mutate({

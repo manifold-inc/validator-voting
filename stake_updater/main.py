@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import psycopg2
 from bittensor_cli.src.bittensor.subtensor_interface import SubtensorInterface
+import urllib.parse
 
 # Load environment variables
 load_dotenv()
@@ -11,20 +12,26 @@ load_dotenv()
 
 def connect_to_database():
     # Get PostgreSQL connection details from environment variables
-    host = os.getenv("DB_HOST")
-    user = os.getenv("DB_USER")
-    password = os.getenv("DB_PASSWORD")
-    port = os.getenv("DB_PORT")
-    database = os.getenv("DB_NAME")
-
+    DATABASE_URL = os.getenv("DATABASE_URL")
+    if DATABASE_URL is None:
+        print("No database url")
+        exit(-1)
     # Create PostgreSQL connection
     try:
+        result = urllib.parse.urlparse(DATABASE_URL)
+        username = result.username
+        password = result.password
+        database = result.path[1:]
+        hostname = result.hostname
+        port = result.port
+        print(DATABASE_URL)
+        print(username, password, database, hostname, port)
         connection = psycopg2.connect(
-            host=host,
-            user=user,
-            password=password,
-            port=port,
             database=database,
+            user=username,
+            password=password,
+            host=hostname,
+            port=port,
         )
         print("Successfully connected to the database")
         return connection
@@ -34,7 +41,7 @@ def connect_to_database():
 
 
 async def get_stake_to_validator(staker_ss58_address, validator_hotkey):
-    subtensor = SubtensorInterface(os.getenv("__finney_test_entrypoint__"))
+    subtensor = SubtensorInterface(os.getenv("NEXT_PUBLIC_FINNEY_ENDPOINT"))
     delegates = await subtensor.get_delegates()
 
     async def find_delegate(delegates, search_key):
@@ -61,12 +68,11 @@ async def update_stake_amounts(connection):
     delegations = cursor.fetchall()
     print(f"Found {len(delegations)} delegations to process")
 
-    validator_hotkey = os.getenv("VALIDATOR_ADDRESS")
+    validator_hotkey = os.getenv("NEXT_PUBLIC_VALIDATOR_ADDRESS")
 
     print(f"Using validator hotkey: {validator_hotkey}")
 
     for delegation in delegations:
-
         delegation_id, staker_ss58_address = delegation
         print(
             f"\nProcessing delegation {delegation_id} for staker {staker_ss58_address}"

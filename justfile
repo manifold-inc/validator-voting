@@ -18,7 +18,7 @@ build:
 # Build and run the Docker container for the stake updater
 docker-start:
     docker build -t stake-updater ./stake_updater
-    docker run -d --name stake-updater-container stake-updater
+    docker run --rm -d --name stake-updater-container --env-file ./.env stake-updater 
 
 # Stop and remove the Docker container
 down:

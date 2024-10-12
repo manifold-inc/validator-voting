@@ -14,6 +14,7 @@ export const env = createEnv({
     NEXT_PUBLIC_VALIDATOR_NAME: z.string(),
     NEXT_PUBLIC_VALIDATOR_ADDRESS: z.string(),
     NEXT_PUBLIC_POLKADOT_EXTENSION_ID: z.string(),
+    NEXT_PUBLIC_FINNEY_ENDPOINT: z.string(),
   },
 
   runtimeEnv: {
@@ -24,6 +25,7 @@ export const env = createEnv({
     NEXT_PUBLIC_VALIDATOR_ADDRESS: process.env.NEXT_PUBLIC_VALIDATOR_ADDRESS,
     NEXT_PUBLIC_POLKADOT_EXTENSION_ID:
       process.env.NEXT_PUBLIC_POLKADOT_EXTENSION_ID,
+    NEXT_PUBLIC_FINNEY_ENDPOINT: process.env.NEXT_PUBLIC_FINNEY_ENDPOINT,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

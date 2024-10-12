@@ -7,7 +7,7 @@ import { genId, userDelegation, userWeights } from "~/server/schema/schema";
 export const weightsRouter = createTRPCRouter({
   getSubnetWeights: publicProcedure.query(async ({ ctx }) => {
     try {
-      const result = await ctx.db.execute(sql`
+      const results = await ctx.db.execute(sql`
         WITH latest_delegations AS (
           SELECT DISTINCT ON (ud.connected_account)
             uw.weights,
@@ -32,7 +32,7 @@ export const weightsRouter = createTRPCRouter({
         ORDER BY weight DESC;
             `);
 
-      return result.map((row) => ({
+      return results.map((row) => ({
         subnet: String(row.subnet),
         weight: Number(row.weight),
       }));
@@ -77,10 +77,7 @@ export const weightsRouter = createTRPCRouter({
           .where(eq(userWeights.connected_account, input.connected_account));
 
         if (result.length === 0) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Account has no weights created",
-          });
+          return [];
         }
 
         const weightsObject = result[0]?.weights ?? {};

@@ -41,7 +41,7 @@ export default function Delegators() {
             placeholder="Search by account address"
             value={searchAddress}
             onChange={(e) => setSearchAddress(e.target.value)}
-            className="mb-4 w-full max-w-md rounded-md px-4 py-2 text-black placeholder:font-mono"
+            className="flex w-fit rounded-md border-0 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 sm:text-sm"
           />
 
           {isLoading ? (
