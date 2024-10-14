@@ -2,18 +2,16 @@
 
 import { api } from "~/trpc/react";
 import { DonutChart } from "@tremor/react";
-import { Description, Field, Label, Switch } from "@headlessui/react";
-import { useState } from "react";
+import { env } from "~/env.mjs";
 
 const dataFormatter = (number: number) => `${number.toFixed(2)}%`;
+const enabled = !!env.NEXT_PUBLIC_INCLUDE_OWNER_VOTES
 
 export default function SubnetWeights() {
-  const [enabled, setEnabled] = useState(false);
   const { data } = api.weights.getSubnetWeights.useQuery();
 
   const { data: totalFreeStake } = api.weights.getStakeNoWeights.useQuery();
 
-  console.log(data);
   let votes;
   if (data) {
     const total_stake = enabled
@@ -39,39 +37,6 @@ export default function SubnetWeights() {
       <div className="relative mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="relative flex flex-col items-center justify-center gap-2 py-2 text-center sm:py-4 lg:px-6 lg:py-12">
           <p className="text-2xl font-semibold text-black">Subnet Weights</p>
-          <Field
-            className={
-              "flex items-center justify-between gap-8 pt-5 text-left" +
-              (!data?.owner_votes ? "hidden" : "")
-            }
-          >
-            <span className="flex flex-grow flex-col">
-              <Label
-                as="span"
-                passive
-                className="text-sm font-medium leading-6 text-gray-900"
-              >
-                Include Owner Votes
-              </Label>
-              <Description
-                as="span"
-                className="text-balance text-sm text-gray-500"
-              >
-                If enabled, owner votes utilize all of the unvoted tao.
-              </Description>
-            </span>
-            <Switch
-              checked={enabled}
-              onChange={setEnabled}
-              className="group relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 data-[checked]:bg-indigo-600"
-            >
-              <span
-                aria-hidden="true"
-                className="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out group-data-[checked]:translate-x-5"
-              />
-            </Switch>
-          </Field>
-
           {votes ? (
             <div className="flex w-full flex-col pt-8 md:flex-row">
               {/* Table */}
