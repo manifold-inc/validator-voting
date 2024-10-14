@@ -7,3 +7,8 @@ export const Account = pgTable("account", {
   weights: json("weights").$type<Record<string, number>>(),
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
+
+export const Validator = pgTable("validator", {
+  ss58: varchar("ss58", { length: 256 }).primaryKey(),
+  stake: bigint("stake", { mode: "bigint" }).notNull(),
+});

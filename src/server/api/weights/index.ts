@@ -2,29 +2,44 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { eq, sql, isNull, sum } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { Account } from "~/server/schema/schema";
+import { Account, Validator } from "~/server/schema/schema";
+import { env } from "~/env.mjs";
 
 export const weightsRouter = createTRPCRouter({
   getSubnetWeights: publicProcedure.query(async ({ ctx }) => {
     try {
-      const [[total_stake], results] = await Promise.all([
+      const [[total_voted_stake], [vali], results] = await Promise.all([
         ctx.db
-          .select({ total_stake: sum(Account.stake).mapWith(Number) })
+          .select({
+            total_stake: sum(Account.stake).mapWith((x) =>
+              x ? BigInt(x as string) : 0n,
+            ),
+          })
           .from(Account),
+        ctx.db
+          .select({ stake: Validator.stake, weights: Account.weights })
+          .from(Validator)
+          .leftJoin(Account, eq(Account.ss58, Validator.ss58))
+          .where(eq(Validator.ss58, env.NEXT_PUBLIC_VALIDATOR_ADDRESS)),
         await ctx.db.execute(sql`
         SELECT 
           key as subnet,
-          SUM(CAST(value AS FLOAT) / 100 * stake) as weight
+          SUM(CAST(value AS INT) / 100 * stake) as weight
         FROM account,
           jsonb_each_text(weights::jsonb) as w(key, value)
         GROUP BY key
         ORDER BY key DESC;
             `),
       ]);
-      return results.map((row) => ({
-        subnet: String(row.subnet),
-        weight: (Number(row.weight) / (total_stake?.total_stake ?? 1)) * 100,
-      }));
+      return {
+        total_voted_stake: total_voted_stake?.total_stake ?? 0n,
+        remaining_stake: vali!.stake - (total_voted_stake?.total_stake ?? 0n),
+        owner_votes: vali!.weights,
+        votes: results.map((row) => ({
+          subnet: String(row.subnet),
+          weight: row.weight ? BigInt(row.weight as string) : 0n,
+        })),
+      };
     } catch (error) {
       console.log(error);
       throw new TRPCError({
