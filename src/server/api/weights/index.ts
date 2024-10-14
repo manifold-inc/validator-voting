@@ -1,42 +1,32 @@
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { eq, sql, isNull } from "drizzle-orm";
+import { eq, sql, isNull, sum } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { genId, userDelegation, userWeights } from "~/server/schema/schema";
+import { Account } from "~/server/schema/schema";
 
 export const weightsRouter = createTRPCRouter({
   getSubnetWeights: publicProcedure.query(async ({ ctx }) => {
     try {
-      const results = await ctx.db.execute(sql`
-        WITH latest_delegations AS (
-          SELECT DISTINCT ON (ud.connected_account)
-            uw.weights,
-            ud.stake
-          FROM user_delegation ud
-          JOIN user_weights uw ON ud.connected_account = uw.connected_account
-          WHERE uw.weights IS NOT NULL AND ud.stake IS NOT NULL
-          ORDER BY ud.connected_account, ud.created_at DESC
-        ),
-        total_stakes AS (
-          SELECT SUM(stake) as total_stake FROM latest_delegations
-        )
+      const [[total_stake], results] = await Promise.all([
+        ctx.db
+          .select({ total_stake: sum(Account.stake).mapWith(Number) })
+          .from(Account),
+        await ctx.db.execute(sql`
         SELECT 
           key as subnet,
-          SUM(CAST(value AS FLOAT) / 100 * stake) as weighted_sum,
-          (SELECT total_stake FROM total_stakes) as total_stake,
-          (SUM(CAST(value AS FLOAT) / 100 * stake) / (SELECT total_stake FROM total_stakes)) * 100 as weight,
-          COUNT(*) as count
-        FROM latest_delegations,
+          SUM(CAST(value AS FLOAT) / 100 * stake) as weight
+        FROM account,
           jsonb_each_text(weights::jsonb) as w(key, value)
         GROUP BY key
-        ORDER BY weight DESC;
-            `);
-
+        ORDER BY key DESC;
+            `),
+      ]);
       return results.map((row) => ({
         subnet: String(row.subnet),
-        weight: Number(row.weight),
+        weight: (Number(row.weight) / (total_stake?.total_stake ?? 1)) * 100,
       }));
     } catch (error) {
+      console.log(error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to retrieve subnet weights",
@@ -48,33 +38,28 @@ export const weightsRouter = createTRPCRouter({
     try {
       const result = await ctx.db
         .select({
-          totalStake: sql<bigint>`sum(${userDelegation.stake})`,
+          totalStake: sql<bigint>`sum(${Account.stake})`,
         })
-        .from(userDelegation)
-        .leftJoin(
-          userWeights,
-          eq(userDelegation.connected_account, userWeights.connected_account),
-        )
-        .where(isNull(userWeights.uw_nanoid));
+        .from(Account)
+        .where(isNull(Account.stake));
 
       return result[0]?.totalStake ?? 0n;
-    } catch (error) {
-      console.error("Error fetching stake with no weights:", error);
+    } catch {
       throw new Error("Failed to fetch stake with no weights");
     }
   }),
   getDelegateSubnetWeights: publicProcedure
     .input(
       z.object({
-        connected_account: z.string(),
+        ss58: z.string(),
       }),
     )
     .query(async ({ ctx, input }) => {
       try {
         const result = await ctx.db
-          .select({ weights: userWeights.weights })
-          .from(userWeights)
-          .where(eq(userWeights.connected_account, input.connected_account));
+          .select({ weights: Account.weights })
+          .from(Account)
+          .where(eq(Account.ss58, input.ss58));
 
         if (result.length === 0) {
           return [];
@@ -99,7 +84,7 @@ export const weightsRouter = createTRPCRouter({
   addDelegateWeights: publicProcedure
     .input(
       z.object({
-        connected_account: z.string(),
+        ss58: z.string(),
         weights: z.array(z.object({ subnet: z.string(), weight: z.number() })),
       }),
     )
@@ -123,27 +108,25 @@ export const weightsRouter = createTRPCRouter({
         // Check if the connected account exists
         const latestDelegation = await ctx.db
           .select()
-          .from(userWeights)
-          .where(eq(userWeights.connected_account, input.connected_account))
+          .from(Account)
+          .where(eq(Account.ss58, input.ss58))
           .limit(1)
           .execute();
 
         if (latestDelegation.length > 0) {
           // Update existing record
           await ctx.db
-            .update(userWeights)
+            .update(Account)
             .set({ weights: weightsRecord })
-            .where(eq(userWeights.connected_account, input.connected_account))
+            .where(eq(Account.ss58, input.ss58))
             .execute();
           return { success: true };
         } else {
           // Insert new record
-          const uw_nanoid = genId.userWeights();
           await ctx.db
-            .insert(userWeights)
+            .insert(Account)
             .values({
-              uw_nanoid: uw_nanoid,
-              connected_account: input.connected_account,
+              ss58: input.ss58,
               weights: weightsRecord,
             })
             .execute();

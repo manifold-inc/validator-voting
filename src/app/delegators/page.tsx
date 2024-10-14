@@ -25,9 +25,7 @@ export default function Delegators() {
 
   const filteredData =
     data?.filter((item) =>
-      item
-        .connected_account!.toLowerCase()
-        .includes(searchAddress.toLowerCase()),
+      item.ss58.toLowerCase().includes(searchAddress.toLowerCase()),
     ) ?? [];
   const price = pythPrice ?? 0;
   return (
@@ -62,12 +60,12 @@ export default function Delegators() {
                   {filteredData.map((item, index) => (
                     <>
                       <tr
-                        key={item.ud_nanoid}
+                        key={item.ss58}
                         onClick={() =>
                           Object.keys(item.weights).length > 0
                             ? setExpandedRow(
-                                expandedRow === index ? null : index,
-                              )
+                              expandedRow === index ? null : index,
+                            )
                             : null
                         }
                         className="cursor-pointer hover:bg-gray-100"
@@ -79,7 +77,7 @@ export default function Delegators() {
                           ${((Number(item.stake!) / 1e9) * price).toFixed(2)}
                         </td>
                         <td className="border-b px-4 py-2 font-mono">
-                          {truncateAddress(item.connected_account!)}
+                          {truncateAddress(item.ss58)}
                         </td>
                         <td className="border-b px-4 py-2">
                           {format(item.timestamp, "yyyy-MM-dd HH:mm:ss")}

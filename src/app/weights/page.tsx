@@ -23,7 +23,7 @@ export default function WeightsPage() {
   const { data: accountWeights, isPending } =
     api.weights.getDelegateSubnetWeights.useQuery(
       {
-        connected_account: connectedAccount ?? "",
+        ss58: connectedAccount ?? "",
       },
       {
         enabled: !!connectedAccount,

@@ -109,7 +109,7 @@ export default function AccountWeights({
           onClick={() => {
             if (connectedAccount) {
               applyWeightsMutation.mutate({
-                connected_account: connectedAccount,
+                ss58: connectedAccount,
                 weights: weights.map(({ subnet, weight }) => ({
                   subnet,
                   weight,

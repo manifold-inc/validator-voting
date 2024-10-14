@@ -36,7 +36,7 @@ export default function Staking() {
 
   const { data: stake, refetch: refetchStake } =
     api.delegate.getDelegateStake.useQuery(
-      { connected_account: connectedAccount ?? "" },
+      { ss58: connectedAccount ?? "" },
       { enabled: !!connectedAccount },
     );
 
