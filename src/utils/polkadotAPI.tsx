@@ -10,7 +10,7 @@ let api: ApiPromise | null = null;
 // Initialize Polkadot API
 export const initPolkadotApi = async () => {
   if (isClient && !api) {
-    const provider = new WsProvider("wss://test.finney.opentensor.ai:443/");
+    const provider = new WsProvider(env.NEXT_PUBLIC_FINNEY_ENDPOINT);
     api = await ApiPromise.create({ provider });
   }
   return api;

@@ -25,9 +25,7 @@ export default function Delegators() {
 
   const filteredData =
     data?.filter((item) =>
-      item
-        .connected_account!.toLowerCase()
-        .includes(searchAddress.toLowerCase()),
+      item.ss58.toLowerCase().includes(searchAddress.toLowerCase()),
     ) ?? [];
   const price = pythPrice ?? 0;
   return (
@@ -41,7 +39,7 @@ export default function Delegators() {
             placeholder="Search by account address"
             value={searchAddress}
             onChange={(e) => setSearchAddress(e.target.value)}
-            className="mb-4 w-full max-w-md rounded-md px-4 py-2 text-black placeholder:font-mono"
+            className="flex w-fit rounded-md border-0 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 sm:text-sm"
           />
 
           {isLoading ? (
@@ -62,24 +60,24 @@ export default function Delegators() {
                   {filteredData.map((item, index) => (
                     <>
                       <tr
-                        key={item.ud_nanoid}
+                        key={item.ss58}
                         onClick={() =>
                           Object.keys(item.weights).length > 0
                             ? setExpandedRow(
-                                expandedRow === index ? null : index,
-                              )
+                              expandedRow === index ? null : index,
+                            )
                             : null
                         }
                         className="cursor-pointer hover:bg-gray-100"
                       >
                         <td className="border-b px-4 py-2">
-                          {Number(item.stake!) / 1e9}
+                          {Number(item.stake!) / 1e9} τ
                         </td>
                         <td className="border-b px-4 py-2">
                           ${((Number(item.stake!) / 1e9) * price).toFixed(2)}
                         </td>
                         <td className="border-b px-4 py-2 font-mono">
-                          {truncateAddress(item.connected_account!)}
+                          {truncateAddress(item.ss58)}
                         </td>
                         <td className="border-b px-4 py-2">
                           {format(item.timestamp, "yyyy-MM-dd HH:mm:ss")}
