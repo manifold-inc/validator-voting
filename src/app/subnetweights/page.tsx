@@ -5,7 +5,7 @@ import { DonutChart } from "@tremor/react";
 import { env } from "~/env.mjs";
 
 const dataFormatter = (number: number) => `${number.toFixed(2)}%`;
-const enabled = !!env.NEXT_PUBLIC_INCLUDE_OWNER_VOTES
+const enabled = !!env.NEXT_PUBLIC_INCLUDE_OWNER_VOTES;
 
 export default function SubnetWeights() {
   const { data } = api.weights.getSubnetWeights.useQuery();
@@ -22,11 +22,11 @@ export default function SubnetWeights() {
         Number(
           (enabled && data.owner_votes
             ? (v.weight +
-              BigInt(
-                ((data.owner_votes[v.subnet] ?? 0) / 100) *
-                Number(data.remaining_stake),
-              )) *
-            10000n
+                BigInt(
+                  ((data.owner_votes[v.subnet] ?? 0) / 100) *
+                    Number(data.remaining_stake),
+                )) *
+              10000n
             : v.weight * 10000n) / total_stake,
         ) * 0.01,
       subnet: v.subnet,

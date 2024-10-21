@@ -34,30 +34,25 @@ Fill in `NEXT_PUBLIC_VALIDATOR_ADDRESS` with your SS58 Address.
 
 Fill in `NEXT_PUBLIC_VALIDATOR_EXTENSION_ID` with the extension that you wish Polkadot to show to your users as the application asking for access.
 
+Fill in `NEXT_PUBLIC_VALIDATOR_EXTENSION_ID` with the extension that you wish Polkadot to show to your users as the application asking for access.
+
+Fill in `NEXT_PUBLIC_INCLUDE_OWNER_VOTES` with either "True" or "False" if you want to include Validator Owner staked amount in your Weight calculation.
+
 ### 4. Install Required Tools
 
-1. Install [just](https://github.com/casey/just#installation) if you haven't already.
+1. Install [bun](https://bun.sh/) if you haven't already.
 
-2. Install [bun](https://bun.sh/) if you haven't already.
-
-3. Install [Docker](https://docs.docker.com/get-docker/) if you haven't already.
+2. Install [Docker](https://docs.docker.com/get-docker/) if you haven't already.
 
 ## Available Commands
 
-This project uses a Justfile to simplify common tasks. Here's a list of available commands and their explanations:
-
-### View All Commands
-
-```sh
-just
-```
-
-This command lists all available commands in the Justfile.
+Here's a list of available commands and their explanations:
 
 ### Setup Application
 
 ```sh
-just setup
+bun install
+bun db:push
 ```
 
 Installs project dependencies using Bun and sets up the database schema.
@@ -65,7 +60,7 @@ Installs project dependencies using Bun and sets up the database schema.
 ### Run Development Server
 
 ```sh
-just dev
+bun dev
 ```
 
 Starts the development server using Bun.
@@ -73,31 +68,34 @@ Starts the development server using Bun.
 ### Build for Production
 
 ```sh
-just build
+bun run build
 ```
 
 Builds the application for production using Bun.
 
-### Start Docker Container
+### Start Docker Container for Stake Updater
 
 ```sh
-just docker-start
+docker build -t stake-updater ./stake_updater
+docker run --rm -d --name stake-updater-container --env-file ./.env stake-updater
 ```
 
-Builds and runs the Docker container for the stake updater. This container updates the database with the current staked values from the blockchain every minute.
+Builds and runs the Docker container for the stake updater. This container updates the database with the current staked values from the blockchain every minute. The `--rm` flag ensures the container is removed when it stops, and the `--env-file ./.env` option loads environment variables from the `.env` file.
 
 ### Stop Docker Container
 
 ```sh
-just down
+docker stop stake-updater-container
 ```
 
-Stops and removes the Docker container for the stake updater.
+Stops the Docker container for the stake updater. The container will be automatically removed due to the `--rm` flag used when starting it.
 
 ### Start Docker and Development Server
 
 ```sh
-just up
+docker build -t stake-updater ./stake_updater
+docker run --rm -d --name stake-updater-container --env-file ./.env stake-updater
+bun dev
 ```
 
 Starts both the Docker container for the stake updater and the development server.
@@ -105,10 +103,14 @@ Starts both the Docker container for the stake updater and the development serve
 ### Full Setup and Start
 
 ```sh
-just start-all
+bun install
+bun db:push
+docker build -t stake-updater ./stake_updater
+docker run --rm -d --name stake-updater-container --env-file ./.env stake-updater
+bun dev
 ```
 
-Performs a complete setup: installs dependencies, sets up the database, starts the Docker container, and runs the development server.
+Performs a complete setup: installs dependencies, sets up the database, starts the Docker container for the stake updater, and runs the development server.
 
 ### Individual Commands
 
@@ -135,7 +137,19 @@ You can also run these commands separately if needed:
 - Run the Docker container:
 
   ```sh
-  docker run -d --name stake-updater-container stake-updater
+  docker run --rm -d --name stake-updater-container --env-file ./.env stake-updater
+  ```
+
+- View Docker container logs:
+
+  ```sh
+  docker logs stake-updater-container
+  ```
+
+  To follow the logs in real-time, add the `-f` flag:
+
+  ```sh
+  docker logs -f stake-updater-container
   ```
 
 - Stop the Docker container:
@@ -150,69 +164,49 @@ You can also run these commands separately if needed:
   docker rm stake-updater-container
   ```
 
-These commands provide flexibility in managing different aspects of the project setup and execution. Use the `just` commands for convenience, or the individual commands for more granular control over the process.
+These commands provide flexibility in managing different aspects of the project setup and execution, including monitoring the Docker container's output.
 
 ### Docker Setup for Stake Updater
 
-The application includes a stake updater that runs in a Docker container. To set it up:
-
-1. Copy `/stake_updater/.env.example` to `/stake_updater/.env`
-2. Fill in the `.env` file with your Supabase connection details (available in your Supabase project settings)
+The application includes a stake updater that runs in a Docker container.
 
 Note: The stake updater in the Docker container updates the database with the "true" staked value on chain every minute. If you don't run this container, your database won't have up-to-date stake information.
 
-## Weights Calculation Script
+## Subnet Weights Calculation
 
-This project includes a Python script for calculating weighted averages of subnet stakes. The script is located at `weights_calc/main.py`.
+This project now calculates subnet weights directly on the front-end, providing real-time updates and a more integrated user experience.
 
-### Setup Instructions for Weights Calculation Script
+### Calculation Logic
 
-1. Ensure you have Python 3.7+ installed on your system.
+The subnet weights are calculated in the `SubnetWeights` component (`src/app/subnetweights/page.tsx`). Here's an overview of the calculation process:
 
-2. Navigate to the `weights_calc` directory in your terminal.
+1. The component fetches the current subnet votes and stake data using API queries.
+2. It determines whether to include owner votes based on the `NEXT_PUBLIC_INCLUDE_OWNER_VOTES` environment variable.
+3. The total stake is calculated, either including or excluding the remaining (unvoted) stake based on the configuration.
+4. For each subnet vote, the weight is calculated as follows:
+   - If owner votes are included, it combines the voted weight with a portion of the remaining stake based on the owner's vote.
+   - The weight is then normalized to a percentage of the total stake.
+5. The results are formatted and displayed to the user.
 
-3. Install the required Python packages:
+### Key Features
 
-   ```sh
-   pip install -r requirements.txt
-   ```
+- **Real-time Calculations**: Weights are computed on-the-fly as data is fetched or updated.
+- **Configurable Owner Vote Inclusion**: The system can optionally include or exclude owner votes in the calculation.
+- **Percentage Formatting**: Weights are displayed as percentages with two decimal places for easy readability.
 
-4. Create a `.env` file in the `weights_calc` directory with the following content:
+### Usage
 
-   ```sh
-   DB_HOST=your_database_host
-   DB_NAME=your_database_name
-   DB_USER=your_database_user
-   DB_PASSWORD=your_database_password
-   ```
+To view and interact with the subnet weights:
 
-   Replace the placeholders with your actual Supabase database credentials, this should be the same as your `stake_updater/.env` sans the
-   finney and test entry points
+1. Ensure your environment is set up correctly, including the `NEXT_PUBLIC_INCLUDE_OWNER_VOTES` variable.
+2. Navigate to the subnet weights page in your browser.
 
-### Running the Weights Calculation Script
+The page will display the current subnet weights based on the latest data from your Supabase database and the configured calculation method.
 
-To run the script:
+### Customization
 
-1. Ensure you're in the `weights_calc` directory.
-2. Run the script using Python:
-
-   ```sh
-   python main.py
-   ```
-
-3. The script will display current weighted averages and prompt you to enter new netuids and weights.
-
-4. After entering the new data, the script will calculate and display the new weighted averages with the unvoted stake to input into BTCLI.
-
-### Script Functionality
-
-- Connects to the Supabase database to retrieve current stake and weight information.
-- Calculates current weighted averages for each subnet.
-- Allows input of new weights for specified netuids.
-- Recalculates weighted averages considering both voted stake and unvoted stake.
-- Displays results in a format ready for input into BTCLI.
-
-This script is crucial for validators to make informed decisions about weight distribution across subnets based on delegator preferences and stakes.
+You can customize the weight calculation by modifying the `SubnetWeights` component in `src/app/subnetweights/page.tsx`. This allows you to adjust the calculation logic, display format, or add additional features as needed for your specific validator requirements. Manifold leaves
+this decision to the Validator themselves.
 
 ### Create Vercel account and push project
 
@@ -222,7 +216,7 @@ a new project and import your forked github repo and paste in your .env file
 For Testing:
 
 1. Remember to change from your finner validator address to your test validator address
-2. Change `subtensor = SubtensorInterface(os.getenv("__finney_entrypoint__"))` to `subtensor = SubtensorInterface(os.getenv("__finney_test_entrypoint__"))`
+2. Change `NEXT_PUBLIC_FINNEY_ENDPOINT="wss://entrypoint-finney.opentensor.ai:443"` to `NEXT_PUBLIC_FINNEY_ENDPOINT="wss://test.finney.opentensor.ai:443/"`
 
 ### Completion
 

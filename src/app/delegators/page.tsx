@@ -64,8 +64,8 @@ export default function Delegators() {
                         onClick={() =>
                           Object.keys(item.weights).length > 0
                             ? setExpandedRow(
-                              expandedRow === index ? null : index,
-                            )
+                                expandedRow === index ? null : index,
+                              )
                             : null
                         }
                         className="cursor-pointer hover:bg-gray-100"

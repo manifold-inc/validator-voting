@@ -34,8 +34,8 @@ export default function WeightsPage() {
     query === ""
       ? subnets
       : subnets.filter((subnet) =>
-        subnet.toLowerCase().includes(query.toLowerCase()),
-      );
+          subnet.toLowerCase().includes(query.toLowerCase()),
+        );
 
   const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

@@ -19,7 +19,11 @@ export const BlurWithoutWallet = ({
       >
         {message}
       </div>
-      <div className={"" + (!connectedAccount ? "pointer-events-none blur-md" : "")}>
+      <div
+        className={
+          "" + (!connectedAccount ? "pointer-events-none blur-md" : "")
+        }
+      >
         {children}
       </div>
     </div>
