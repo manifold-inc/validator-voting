@@ -36,7 +36,7 @@ Fill in `NEXT_PUBLIC_VALIDATOR_EXTENSION_ID` with the extension that you wish Po
 
 Fill in `NEXT_PUBLIC_VALIDATOR_EXTENSION_ID` with the extension that you wish Polkadot to show to your users as the application asking for access.
 
-Fill in `NEXT_PUBLIC_INCLUDE_OWNER_VOTES` with either "True" or "False" if you want to include Validator Owner staked amount in your Weight calculation.
+Fill in `NEXT_PUBLIC_INCLUDE_OWNER_VOTES` with "True" if you want to include Validator Owner staked amount in your Weight calculation. If you do not want to include Validator Owner staked amount, remove `NEXT_PUBLIC_INCLUDE_OWNER_VOTES`
 
 ### 4. Install Required Tools
 
